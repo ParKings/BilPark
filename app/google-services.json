@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "521605887340",
+    "firebase_url": "https://bilparkandroidprojects.firebaseio.com",
+    "project_id": "bilparkandroidprojects",
+    "storage_bucket": "bilparkandroidprojects.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521605887340:android:b9c2afe88851b20a",
+        "android_client_info": {
+          "package_name": "com.parkings.bilpark"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521605887340-8du88vprogp6lc14k84okolqcc4ud1df.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.parkings.bilpark",
+            "certificate_hash": "577f2f50739fc90732b9073f85472ddff1649863"
+          }
+        },
+        {
+          "client_id": "521605887340-mrs13k48vvti1tfc9m6da4ridahviriu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSh15yMFWREQ1mfjEAqdYNY8k580qKom8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521605887340-mrs13k48vvti1tfc9m6da4ridahviriu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
