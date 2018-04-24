@@ -1,8 +1,11 @@
 package com.parkings.bilpark;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,13 +14,16 @@ import java.util.Locale;
 import java.util.HashMap;
 
 /**
+ * <p>
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
+ * ToDo: Utilize everything down to (including) the getStatistics(String, String) method.
+ * </p>
  * <p>
  * Includes code written by Uğur Yılmaz on 15.04.2018 (Park method and the constructor).
- *
+ * </p>
  * @author Emre Acarturk
- * @version 2018.04.23.0
+ * @version 2018.04.24.0
  */
 public class ServerUtil {
 
@@ -57,6 +63,7 @@ public class ServerUtil {
 	private static boolean initialized;
 	private static ParkingLot[] parkingLots;
 	private static ParkingRow[] parkingRows;
+	private static HashMap<String, Double> occupancyData;
 	private static int totalSpots = 0;
 	private static int occupiedSpots;
 
@@ -85,8 +92,9 @@ public class ServerUtil {
 	static {
 		// The method "initLotsAndRows" is not yet called
 		initialized = false;
+		occupancyData = new HashMap<>();
 
-		// Object initializations
+		// Database and reference object initializations
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 		DatabaseReference rootReference = firebaseDatabase.getReference();
 
@@ -238,6 +246,32 @@ public class ServerUtil {
 	protected static HashMap<String, Double> getStatistics(String lotName, String periodType) {
 
 		return null;
+	}
+
+	/**
+	 * Returns the concurrent occupancy data in a HashMap with given keys.
+	 *
+	 * @return new HashMap<String, Double> =
+	 *            {
+	 *               mescidLotTag  : double
+	 *               nanotamLotTag : double
+	 *               unamLotTag    : double
+	 *            }
+	 */
+	protected static HashMap<String, Double> getOccupancy() {
+		statisticsReference.child("concurrent")
+				.addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				occupancyData = dataSnapshot.getValue(HashMap.class);
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+		return occupancyData;
 	}
 
 	/**
