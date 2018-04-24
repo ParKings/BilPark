@@ -11,88 +11,54 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Utilize everything down to (including) the getStatistics(String, String) method.
+ * ToDo: Everything except park() and unpark() methods are connected to the server.
+ * </p>
+ * <p>
+ * <b>Implementation note:</b> ArrayList used might not be thread-safe. Find a better alternative.
  * </p>
  * <p>
  * Includes code written by Uğur Yılmaz on 15.04.2018 (Park method and the constructor).
  * </p>
  * @author Emre Acarturk
- * @version 2018.04.24.0
+ * @version 2018.04.25.0
  */
 public class ServerUtil {
 
 	// Constants
-	/**
-	 * A reference to the statistics section of the database
-	 */
 	private static final DatabaseReference statisticsReference;
-	/**
-	 * A reference to the parking data section of the database
-	 */
 	private static final DatabaseReference parkingDataReference;
+	private static final DatabaseReference complaintsReference;
 
-	/**
-	 * String tag for reaching root's statistics child
-	 */
-	private static final String statisticsTag = "statistics";
-	/**
-	 * String tag for reaching root's parking data child
-	 */
+	private static final String statisticsTag  = "statistics";
 	private static final String parkingDataTag = "parkingdata";
+	private static final String complaintsTag  = "complaints";
 
-	/**
-	 * Tag for reaching the "nanotam" lot from parking data and
-	 */
 	public static final String nanotamLotTag = "nanotam";
-	/**
-	 * Tag for reaching the "unam" lot from parking data and
-	 */
-	public static final String unamLotTag = "unam";
-	/**
-	 * Tag for reaching the "mescid" lot from parking data and
-	 */
-	public static final String mescidLotTag = "mescid";
+	public static final String unamLotTag    = "unam";
+	public static final String mescidLotTag  = "mescid";
 
 	//properties
 	private static boolean initialized;
 	private static ParkingLot[] parkingLots;
 	private static ParkingRow[] parkingRows;
-	private static HashMap<String, Double> occupancyData;
+	private static ConcurrentHashMap<String, Double> occupancyData;
+	private static ConcurrentHashMap<String, Double> statisticsData;
+	private static ArrayList<ParkingSpot> parkedSlots;
 	private static int totalSpots = 0;
 	private static int occupiedSpots;
-
-	/*  Eject something alike.
-
-		// Read from the database
-		myRef.addValueEventListener(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				// This method is called once with the initial value and again
-				// whenever data at this location is updated.
-				String value = dataSnapshot.getValue(String.class);
-				Log.d(TAG, "Value is: " + value);
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error) {
-				// Failed to read value
-				Log.w(TAG, "Failed to read value.", error.toException());
-			}
-		});
-
-	 */
 
 	// Static initializer
 	static {
 		// The method "initLotsAndRows" is not yet called
 		initialized = false;
-		occupancyData = new HashMap<>();
+		occupancyData = new ConcurrentHashMap<>();
+		statisticsData = new ConcurrentHashMap<>();
 
 		// Database and reference object initializations
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -104,13 +70,30 @@ public class ServerUtil {
 		// Main children, from root
 		statisticsReference = rootReference.child(statisticsTag);
 		parkingDataReference = rootReference.child(parkingDataTag);
+		complaintsReference = rootReference.child(complaintsTag);
 
 		// Statistics' children; lots
 		statisticsReference.child(nanotamLotTag);
 		statisticsReference.child(unamLotTag);
 		statisticsReference.child(mescidLotTag);
 
-		;
+		// Parked slot data retrieval listener.
+		parkedSlots = new ArrayList<>();
+		parkingDataReference.child("slots")
+				.orderByChild(ParkingSpot.isParkedTag).equalTo(true) // Those slots that are parked
+				.addValueEventListener(new ValueEventListener() {
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						// ToDo: Write the following retrieval line thoroughly. Currently wrong.
+						parkedSlots = dataSnapshot.getValue(ArrayList.class);
+					}
+
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
+
+					}
+				});
+
 	}
 
 	// Static methods
@@ -145,15 +128,7 @@ public class ServerUtil {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
 				if (parkingSpot.contains(latLng) && !parkingSpot.getParked()) {
 					parkingSpot.setParked(true);
-					return new LatLng(
-							(parkingSpot.corners[2].latitude
-									+ parkingSpot.corners[3].latitude
-									+ ((parkingSpot.corners[1].latitude - parkingSpot.corners[2].latitude) / 3)
-									+ ((parkingSpot.corners[0].latitude - parkingSpot.corners[3].latitude) / 3)) / 2,
-							(parkingSpot.corners[2].longitude
-									+ parkingSpot.corners[3].longitude
-									+ ((parkingSpot.corners[1].longitude - parkingSpot.corners[2].longitude) / 3)
-									+ ((parkingSpot.corners[0].longitude - parkingSpot.corners[3].longitude) / 3)) / 2);
+					return parkingSpot.getCenter();
 				}
 			}
 		}
@@ -186,20 +161,12 @@ public class ServerUtil {
 			if (parkingLot.contains(latLng))
 				parkingLot.occupiedSlots--;
 
-		// Unparking to a ParkingSlot
+		// Unparking from a ParkingSlot
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
 				if (parkingSpot.contains(latLng) && parkingSpot.getParked()) {
 					parkingSpot.setParked(false);
-					return new LatLng(
-							(parkingSpot.corners[2].latitude
-									+ parkingSpot.corners[3].latitude
-									+ ((parkingSpot.corners[1].latitude - parkingSpot.corners[2].latitude) / 3)
-									+ ((parkingSpot.corners[0].latitude - parkingSpot.corners[3].latitude) / 3)) / 2,
-							(parkingSpot.corners[2].longitude
-									+ parkingSpot.corners[3].longitude
-									+ ((parkingSpot.corners[1].longitude - parkingSpot.corners[2].longitude) / 3)
-									+ ((parkingSpot.corners[0].longitude - parkingSpot.corners[3].longitude) / 3)) / 2);
+					return parkingSpot.getCenter();
 				}
 			}
 		}
@@ -212,9 +179,8 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	protected static ArrayList<LatLng> getParked() {
-
-		return null;
+	protected static ArrayList<ParkingSpot> getParked() {
+		return parkedSlots;
 	}
 
 	/**
@@ -223,7 +189,7 @@ public class ServerUtil {
 	 * @param complaintBody The complaint body.
 	 */
 	protected static void sendComplaint(String complaintBody) {
-
+		complaintsReference.child("apprelated").push().setValue(complaintBody);
 	}
 
 	/**
@@ -233,7 +199,8 @@ public class ServerUtil {
 	 * @param relatedLotName The name of the lot related to the complaint.
 	 */
 	protected static void sendComplaint(String complaintBody, String relatedLotName) {
-
+		complaintsReference.child("userrelated").push()
+				.setValue(new Complaint(complaintBody, relatedLotName));
 	}
 
 	/**
@@ -243,27 +210,38 @@ public class ServerUtil {
 	 * @param periodType The period type, namely "Daily", "Weekly" or "Monthly".
 	 * @return A map mapping occupancy ratios (data) to predetermined String key values.
 	 */
-	protected static HashMap<String, Double> getStatistics(String lotName, String periodType) {
+	protected static ConcurrentHashMap<String, Double> getStatistics(String lotName, String periodType) {
+		statisticsReference.child(lotName).child(periodType)
+				.addListenerForSingleValueEvent(new ValueEventListener() {
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						statisticsData = dataSnapshot.getValue(ConcurrentHashMap.class);
+					}
 
-		return null;
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
+
+					}
+				});
+		return statisticsData;
 	}
 
 	/**
-	 * Returns the concurrent occupancy data in a HashMap with given keys.
+	 * Returns the concurrent occupancy data in a ConcurrentHashMap with given keys.
 	 *
-	 * @return new HashMap<String, Double> =
+	 * @return new ConcurrentHashMap<String, Double> =
 	 *            {
 	 *               mescidLotTag  : double
 	 *               nanotamLotTag : double
 	 *               unamLotTag    : double
 	 *            }
 	 */
-	protected static HashMap<String, Double> getOccupancy() {
+	protected static ConcurrentHashMap<String, Double> getOccupancy() {
 		statisticsReference.child("concurrent")
 				.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				occupancyData = dataSnapshot.getValue(HashMap.class);
+				occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
 			}
 
 			@Override
