@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Everything except park() and unpark() methods are connected to the server.
+ * ToDo: Listener for getParked() method; initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
  * </p>
  * <p>
  * <b>Implementation note:</b> ArrayList used might not be thread-safe. Find a better alternative.
@@ -43,20 +43,16 @@ public class ServerUtil {
 	public static final String unamLotTag    = "unam";
 	public static final String mescidLotTag  = "mescid";
 
-	//properties
-	private static boolean initialized;
+	// Properties
 	private static ParkingLot[] parkingLots;
 	private static ParkingRow[] parkingRows;
 	private static ConcurrentHashMap<String, Double> occupancyData;
 	private static ConcurrentHashMap<String, Double> statisticsData;
 	private static ArrayList<ParkingSpot> parkedSlots;
-	private static int totalSpots = 0;
-	private static int occupiedSpots;
 
 	// Static initializer
 	static {
 		// The method "initLotsAndRows" is not yet called
-		initialized = false;
 		occupancyData = new ConcurrentHashMap<>();
 		statisticsData = new ConcurrentHashMap<>();
 
@@ -76,6 +72,15 @@ public class ServerUtil {
 		statisticsReference.child(nanotamLotTag);
 		statisticsReference.child(unamLotTag);
 		statisticsReference.child(mescidLotTag);
+
+		// Serializing ParkingSlot variables in the database
+		int i = 0;
+		for (ParkingRow parkingRow : parkingRows) {
+			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
+				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
+			}
+			i++;
+		}
 
 		// Parked slot data retrieval listener.
 		parkedSlots = new ArrayList<>();
@@ -119,17 +124,22 @@ public class ServerUtil {
 	 */
 	protected static LatLng park(LatLng latLng) {
 		// Incrementing in parking lot scale
-		for (ParkingLot parkingLot : parkingLots)
-			if (parkingLot.contains(latLng))
+		for (ParkingLot parkingLot : parkingLots) {
+			if (parkingLot.contains(latLng) && !parkingLot.isFull()) {
 				parkingLot.occupiedSlots++;
-
+				parkingDataReference.child("lots").setValue(parkingLot);
+			}
+		}
 		// Parking to a ParkingSlot
+		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && !parkingSpot.getParked()) {
-					parkingSpot.setParked(true);
+				if (parkingSpot.contains(latLng) && parkingSpot.getParkDate().equals("")) {
+					parkingSpot.park(getTime());
+					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
 				}
+				i++;
 			}
 		}
 		// If no appropriate ParkingSpot is found,
@@ -157,17 +167,22 @@ public class ServerUtil {
 	 */
 	protected static LatLng unpark(LatLng latLng) {
 		// Decreasing in parking lot scale
-		for (ParkingLot parkingLot : parkingLots)
-			if (parkingLot.contains(latLng))
+		for (ParkingLot parkingLot : parkingLots) {
+			if (parkingLot.contains(latLng) && !parkingLot.isEmpty()) {
 				parkingLot.occupiedSlots--;
-
+				parkingDataReference.child("lots").setValue(parkingLot);
+			}
+		}
 		// Unparking from a ParkingSlot
+		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && parkingSpot.getParked()) {
-					parkingSpot.setParked(false);
+				if (parkingSpot.contains(latLng) && !parkingSpot.getParkDate().equals("")) {
+					parkingSpot.unpark();
+					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
 				}
+				i++;
 			}
 		}
 		// If no appropriate ParkingSpot is found,
@@ -261,12 +276,6 @@ public class ServerUtil {
 	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
 		ServerUtil.parkingLots = parkingLots;
 		ServerUtil.parkingRows = parkingRows;
-		for (ParkingLot parkingLot : parkingLots) {
-			totalSpots += parkingLot.totalSlots;
-		}
-		occupiedSpots = 0;
-
-		initialized = true;
 	}
 
 	/**

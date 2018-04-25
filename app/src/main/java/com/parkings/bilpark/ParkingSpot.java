@@ -16,12 +16,16 @@ public class ParkingSpot {
 	//SIDE 01 AND 32 ARE SHORTER ONES
 	// Constants
 	@Exclude
-	public static final String isParkedTag = "isParked";
+	public static final String isParkedTag   = "isParked";
 	@Exclude
-	public static final String centerTag = "center";
+	public static final String centerTag     = "center";
+	@Exclude
+	public static final String minimumString = "";
+	@Exclude
+	public static final String maximumString = ":";
 
 	//properties
-	private boolean isParked;
+	private String parkDate;
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
@@ -42,16 +46,20 @@ public class ParkingSpot {
 						+ corners[3].longitude
 						+ ((corners[1].longitude - corners[2].longitude) / 3)
 						+ ((corners[0].longitude - corners[3].longitude) / 3)) / 2);
-		isParked = false;
+		parkDate = minimumString;
 	}
 
 	//methods
-	public void setParked(boolean isParked) {
-		this.isParked = isParked;
+	public void park(String parkDate) {
+		this.parkDate = parkDate;
 	}
 
-	public boolean getParked() {
-		return isParked;
+	public void unpark () {
+		this.parkDate = minimumString;
+	}
+
+	public String getParkDate() {
+		return parkDate;
 	}
 
 	@Exclude
