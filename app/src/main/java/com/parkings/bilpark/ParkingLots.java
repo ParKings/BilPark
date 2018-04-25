@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by uğur on 15.04.2018.
+ * Last modified by Emre on 25.04.2018, fixed a dependency change bug.
  *
  * @deprecated Functionality transferred to ServerUtil methods of same name.
  */
@@ -52,15 +53,7 @@ public class ParkingLots {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
 				if (parkingSpot.contains(location) && !parkingSpot.getParked()) {
 					parkingSpot.setParked(true);
-					return new LatLng(
-							(parkingSpot.corners[2].latitude
-									+ parkingSpot.corners[3].latitude
-									+ ((parkingSpot.corners[1].latitude - parkingSpot.corners[2].latitude) / 3)
-									+ ((parkingSpot.corners[0].latitude - parkingSpot.corners[3].latitude) / 3)) / 2,
-							(parkingSpot.corners[2].longitude
-									+ parkingSpot.corners[3].longitude
-									+ ((parkingSpot.corners[1].longitude - parkingSpot.corners[2].longitude) / 3)
-									+ ((parkingSpot.corners[0].longitude - parkingSpot.corners[3].longitude) / 3)) / 2);
+					return parkingSpot.getCenter();
 				}
 			}
 		}
@@ -79,15 +72,7 @@ public class ParkingLots {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
 				if (parkingSpot.contains(location) && parkingSpot.getParked()) {
 					parkingSpot.setParked(false);
-					return new LatLng(
-							(parkingSpot.corners[2].latitude
-									+ parkingSpot.corners[3].latitude
-									+ ((parkingSpot.corners[1].latitude - parkingSpot.corners[2].latitude) / 3)
-									+ ((parkingSpot.corners[0].latitude - parkingSpot.corners[3].latitude) / 3)) / 2,
-							(parkingSpot.corners[2].longitude
-									+ parkingSpot.corners[3].longitude
-									+ ((parkingSpot.corners[1].longitude - parkingSpot.corners[2].longitude) / 3)
-									+ ((parkingSpot.corners[0].longitude - parkingSpot.corners[3].longitude) / 3)) / 2);
+					return parkingSpot.getCenter();
 				}
 			}
 		}
