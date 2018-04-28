@@ -35,6 +35,11 @@ public class ParkingLot {
 
 	//methods
 	@Exclude
+	public String getName() {
+		return name;
+	}
+
+	@Exclude
 	public boolean contains(LatLng latLng) {
 		double totalArea = 0.5 * Math.abs(
 				corners[0].latitude * corners[1].longitude +
