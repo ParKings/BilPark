@@ -14,19 +14,43 @@ public class LotStatistics {
     private ParkingLot lot;
 
     //constructor
+
+    /**
+     * Default constructor
+     *
+     * @param lot
+     */
     public LotStatistics(ParkingLot lot) {
         this.lot = lot;
     }
 
     //methods
+    /**
+     * Receives daily statistics of particular parking lot
+     * and obtains such statistics from the server
+     *
+     * @return ConcurrentHashMap<String, Double>
+     */
     public ConcurrentHashMap<String, Double> getDaily() {
         return ServerUtil.getStatistics(lot.getName(), DAILY);
     }
 
+    /**
+     * Receives weekly statistics of particular parking lot
+     * and obtains such statistics from the server
+     *
+     * @return ConcurrentHashMap<String, Double>
+     */
     public ConcurrentHashMap<String, Double> getWeekly() {
         return ServerUtil.getStatistics(lot.getName(), WEEKLY);
     }
 
+    /**
+     * Receives monthly statistics of particular parking lot
+     * and obtains such statistics from the server
+     *
+     * @return ConcurrentHashMap<String, Double>
+     */
     public ConcurrentHashMap<String, Double> getMonthly() {
         return ServerUtil.getStatistics(lot.getName(), MONTHLY);
     }
