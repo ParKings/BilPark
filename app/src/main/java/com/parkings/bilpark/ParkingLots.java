@@ -4,7 +4,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by uğur on 15.04.2018.
- * Last modified by Emre on 25.04.2018, fixed a dependency change bug.
+ * Last modified by Emre on 28.04.2018, added warning statement.
+ *
+ * <p>
+ * <b>Warning:</b> Lost functionality, a.k.a. not backwards compatible
+ * </p>
  *
  * @deprecated Functionality transferred to ServerUtil methods of same name.
  */

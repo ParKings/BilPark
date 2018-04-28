@@ -15,12 +15,15 @@ import com.example.uur.bilpark.R;
  */
 
 public class ComplaintsFragment extends Fragment {
+
+	/* __________STUB__________ */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.complaints_fragment, null);
 	}
 
+	/* __________STUB__________ */
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

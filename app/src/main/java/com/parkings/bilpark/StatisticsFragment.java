@@ -15,6 +15,8 @@ import com.example.uur.bilpark.R;
 
 // IN FRAGMENTS USE getActivity() METHOD INSTEAD OF getApplicationContext() THAT YOU WOULD NORMALLY USE
 public class StatisticsFragment extends Fragment {
+
+	/* __________STUB__________ */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

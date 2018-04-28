@@ -4,6 +4,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by uğur on 15.04.2018.
+ * Last edited by Emre on 28.04.2018.
+ *
+ * @author uğur
+ * @version 2018.04.2018 : JavaDoc added.
  */
 //CORNERS ARE ASSIGNED IN COUNTERCLOCKWISE DIRECTION
 //SIDE 03 AND 12 ARE SHORTER ONES
@@ -15,6 +19,12 @@ public class ParkingRow {
 	ParkingSpot[] parkingSpots;
 
 	//constructor
+	/**
+	 * The constructor which constructs parking spots within a given parking row
+	 *
+	 * @param spotNumber How many parking slots exist in the given row
+	 * @param corners    What are the 4 corners of the given row
+	 */
 	public ParkingRow(int spotNumber, LatLng[] corners) {
 		this.spotNumber = spotNumber;
 		this.corners = corners;

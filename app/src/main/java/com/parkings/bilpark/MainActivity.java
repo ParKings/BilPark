@@ -45,6 +45,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+/**
+ * This is the main "Park" activity; the starting point of our application.
+ * Includes a map and related API tools for geolocating and putting markers.
+ *
+ * All overridden and/or implemented methods' functionality should be checked
+ * from the superclass's/interface's JavaDocs.
+ *
+ * @author Ugur
+ * @version Initial release
+ */
 public class MainActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
@@ -175,6 +185,9 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
+	/**
+	 * Refreshes the user location data
+	 */
 	public void getUserLocation() {
 		Log.i("KONUM", "ISTENDI");
 		//mMap.clear();
