@@ -5,10 +5,10 @@ import com.google.firebase.database.Exclude;
 
 /**
  * Created by uğur on 15.04.2018.
- * Last edited by Emre Acarturk.
+ * Last edited by Emre Acarturk. Added JavaDoc.
  *
  * @author Uğur
- * @version 25.04.2018.0
+ * @version 28.04.2018.0
  */
 public class ParkingSpot {
 	//CORNERS ARE ASSIGNED IN COUNTERCLOCKWISE DIRECTION
@@ -31,10 +31,16 @@ public class ParkingSpot {
 	private LatLng[] corners;
 
 	//constructors
-	public ParkingSpot() {
-		// Required for Firebase
-	}
+	/**
+	 * Default constructor needed for Firebase integration
+	 */
+	public ParkingSpot() {}
 
+	/**
+	 * Secondary constructor initializing parameters.
+	 *
+	 * @param corners The corners of this parking spot
+	 */
 	public ParkingSpot(LatLng[] corners) {
 		this.corners = corners;
 		center = new LatLng(
@@ -50,27 +56,58 @@ public class ParkingSpot {
 	}
 
 	//methods
+
+	/**
+	 * Sets the spot's status to occupied by storing the parking date
+	 *
+	 * @param parkDate The time parking occurred
+	 */
 	public void park(String parkDate) {
 		this.parkDate = parkDate;
 	}
 
+	/**
+	 * Sets the spot's status to unoccupied by storing the "minimum string" as date
+	 */
 	public void unpark () {
 		this.parkDate = minimumString;
 	}
 
+	/**
+	 * Getter for parking date
+	 *
+	 * @return Park date
+	 */
 	public String getParkDate() {
 		return parkDate;
 	}
 
+	/**
+	 * Returns the spot's corners
+	 *
+	 * @return The corners of this spot
+	 */
 	@Exclude
 	public LatLng[] getCorners() {
 		return corners;
 	}
 
+	/**
+	 * Returns the coordinates of this parking spot.
+	 *
+	 * @return Coordinates of this parking spot's center
+	 */
 	public LatLng getCenter() {
 		return center;
 	}
 
+	/**
+	 * Returns true if the given point is effectively within the spot's reach
+	 *
+	 * @param latLng The coordinate to be checked
+	 * @return true; if the given point is effectively within the spot's reach
+	 *         false; else
+	 */
 	@Exclude
 	public boolean contains(LatLng latLng) {
 		double totalArea = 0.5 * Math.abs(corners[0].latitude * corners[1].longitude +
