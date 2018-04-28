@@ -10,7 +10,7 @@ public class LotStatistics {
     //properties
     private final String DAILY = "Daily";
     private final String WEEKLY = "Weekly";
-    private final String MONTHLY = "monthly";
+    private final String MONTHLY = "Monthly";
     private ParkingLot lot;
 
     //constructor
