@@ -4,7 +4,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by uğur on 15.04.2018.
- * Last modified by Emre on 25.04.2018, fixed a dependency change bug.
+ * Last modified by Emre on 28.04.2018, added warning statement.
+ *
+ * <p>
+ * <b>Warning:</b> Lost functionality, a.k.a. not backwards compatible
+ * </p>
  *
  * @deprecated Functionality transferred to ServerUtil methods of same name.
  */
@@ -51,8 +55,8 @@ public class ParkingLots {
 		// Parking to a ParkingSlot
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(location) && !parkingSpot.getParked(null)) {
-					parkingSpot.setParked(true);
+				if (parkingSpot.contains(location) /*&& !parkingSpot.getParked(null)*/) {
+					/*parkingSpot.setParked(true);*/
 					return parkingSpot.getCenter();
 				}
 			}
@@ -70,8 +74,8 @@ public class ParkingLots {
 		// Unparking to a ParkingSlot
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(location) && parkingSpot.getParked()) {
-					parkingSpot.setParked(false);
+				if (parkingSpot.contains(location) /*&& parkingSpot.getParked()*/) {
+					/*parkingSpot.setParked(false);*/
 					return parkingSpot.getCenter();
 				}
 			}

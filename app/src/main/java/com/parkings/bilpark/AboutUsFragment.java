@@ -14,6 +14,8 @@ import com.example.uur.bilpark.R;
  */
 
 public class AboutUsFragment extends Fragment {
+
+	/* __________STUB__________ */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
