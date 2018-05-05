@@ -45,16 +45,21 @@ public class ParkingLot {
 	//methods
 
 	/**
-	 * Returns true if the given coordinates are within reasonable proximity of the given lot
-	 * @param latLng The coordinate to be checked
-	 * @return true;  if the given coordinates are within reasonable proximity of the given lot
-	 *         false; otherwise
+	 * Yields the name of the lot
+	 *
+	 * @return name
 	 */
 	@Exclude
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Returns true if the given coordinates are within reasonable proximity of the given lot
+	 * @param latLng The coordinate to be checked
+	 * @return true;  if the given coordinates are within reasonable proximity of the given lot
+	 *         false; otherwise
+	 */
 	@Exclude
 	public boolean contains(LatLng latLng) {
 		double totalArea = 0.5 * Math.abs(
