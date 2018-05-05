@@ -199,6 +199,13 @@ public class ServerUtil {
 	}
 
 	/**
+	 * Returns all ParkingLots
+	 *
+	 * @return all ParkingLots
+	 */
+	protected static ParkingLot[] getParkingLots() { return parkingLots; }
+
+	/**
 	 * Sends the app-related complaint to the server.
 	 *
 	 * @param complaintBody The complaint body.
