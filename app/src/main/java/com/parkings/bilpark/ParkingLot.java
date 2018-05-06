@@ -45,6 +45,16 @@ public class ParkingLot {
 	//methods
 
 	/**
+	 * Yields the name of the lot
+	 *
+	 * @return name
+	 */
+	@Exclude
+	public String getName() {
+		return name;
+	}
+
+	/**
 	 * Returns true if the given coordinates are within reasonable proximity of the given lot
 	 * @param latLng The coordinate to be checked
 	 * @return true;  if the given coordinates are within reasonable proximity of the given lot
