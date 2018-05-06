@@ -4,7 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 
 /**
- * Created by uğur on 15.04.2018.
+ * Created by uğur on 06.05.2018.
  * Last edited by Emre Acarturk. Added JavaDoc.
  *
  * @author Uğur
@@ -19,13 +19,9 @@ public class ParkingSpot {
 	public static final String isParkedTag   = "isParked";
 	@Exclude
 	public static final String centerTag     = "center";
-	@Exclude
-	public static final String minimumString = "";
-	@Exclude
-	public static final String maximumString = ":";
 
 	//properties
-	private String parkDate;
+	private boolean isParked;
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
@@ -52,7 +48,7 @@ public class ParkingSpot {
 						+ corners[3].longitude
 						+ ((corners[1].longitude - corners[2].longitude) / 3)
 						+ ((corners[0].longitude - corners[3].longitude) / 3)) / 2);
-		parkDate = minimumString;
+		isParked = false;
 	}
 
 	//methods
@@ -60,26 +56,25 @@ public class ParkingSpot {
 	/**
 	 * Sets the spot's status to occupied by storing the parking date
 	 *
-	 * @param parkDate The time parking occurred
 	 */
-	public void park(String parkDate) {
-		this.parkDate = parkDate;
+	public void park() {
+		isParked = true;
 	}
 
 	/**
 	 * Sets the spot's status to unoccupied by storing the "minimum string" as date
 	 */
 	public void unpark () {
-		this.parkDate = minimumString;
+		isParked = false;
 	}
 
 	/**
-	 * Getter for parking date
+	 * Getter for isParked
 	 *
-	 * @return Park date
+	 * @return isParked
 	 */
-	public String getParkDate() {
-		return parkDate;
+	public boolean isParked() {
+		return isParked;
 	}
 
 	/**
