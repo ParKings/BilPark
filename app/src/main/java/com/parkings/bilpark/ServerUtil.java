@@ -1,5 +1,7 @@
 package com.parkings.bilpark;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,7 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Listener for getParked() method; initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
+ * ToDo: Listener for getParked() method
+ * ToDo: Initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
  * </p>
  * <p>
  * <b>Implementation note:</b> ArrayList used might not be thread-safe. Find a better alternative.
@@ -284,11 +287,16 @@ public class ServerUtil {
 	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
 		// ToDo: Special case: null && null
 		if (parkingLots == null && parkingRows == null) {
-			ServerUtil.parkingLots = new ParkingLot[0];
-			ServerUtil.parkingRows = new ParkingRow[0];
+			ServerUtil.parkingLots = new ParkingLot[1];
+			ServerUtil.parkingLots[0] = new ParkingLot(1, new LatLng[0], nanotamLotTag);
+			ServerUtil.parkingRows = new ParkingRow[1];
+			ServerUtil.parkingRows[0] = new ParkingRow(0, new LatLng[0]);
+
+			Log.i("CHECK_FOR_NPE", ServerUtil.parkingLots + " & " + ServerUtil.parkingRows);
+		} else {
+			ServerUtil.parkingLots = parkingLots;
+			ServerUtil.parkingRows = parkingRows;
 		}
-		ServerUtil.parkingLots = parkingLots;
-		ServerUtil.parkingRows = parkingRows;
 	}
 
 	/**
