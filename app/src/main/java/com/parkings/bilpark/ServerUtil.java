@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes code written by Uğur Yılmaz on 15.04.2018 (Park method and the constructor).
  * </p>
+ *
  * @author Emre Acarturk
  * @version 2018.04.25.0
  */
@@ -34,6 +35,7 @@ public class ServerUtil {
 	private static final DatabaseReference statisticsReference;
 	private static final DatabaseReference parkingDataReference;
 	private static final DatabaseReference complaintsReference;
+	private static final int noOfSlots;
 
 	private static final String statisticsTag  = "statistics";
 	private static final String parkingDataTag = "parkingdata";
@@ -81,6 +83,7 @@ public class ServerUtil {
 			}
 			i++;
 		}
+		noOfSlots = i;
 
 		// Parked slot data retrieval listener.
 		parkedSlots = new ArrayList<>();
@@ -90,13 +93,11 @@ public class ServerUtil {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
 						// ToDo: Write the following retrieval line thoroughly. Currently wrong.
-						parkedSlots = dataSnapshot.getValue(ArrayList.class);
+						ArrayList<Object> x = dataSnapshot.getValue(ArrayList.class);
 					}
 
 					@Override
-					public void onCancelled(DatabaseError databaseError) {
-
-					}
+					public void onCancelled(DatabaseError databaseError) {}
 				});
 
 	}
@@ -134,8 +135,8 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && parkingSpot.getParkDate().equals("")) {
-					parkingSpot.park(getTime());
+				if (parkingSpot.contains(latLng) && !parkingSpot.isParked()) {
+					parkingSpot.park();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
 				}
@@ -177,7 +178,7 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && !parkingSpot.getParkDate().equals("")) {
+				if (parkingSpot.contains(latLng) && !parkingSpot.isParked()) {
 					parkingSpot.unpark();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
@@ -197,6 +198,13 @@ public class ServerUtil {
 	protected static ArrayList<ParkingSpot> getParked() {
 		return parkedSlots;
 	}
+
+	/**
+	 * Returns all ParkingLots
+	 *
+	 * @return all ParkingLots
+	 */
+	protected static ParkingLot[] getParkingLots() { return parkingLots; }
 
 	/**
 	 * Sends the app-related complaint to the server.
@@ -254,16 +262,16 @@ public class ServerUtil {
 	protected static ConcurrentHashMap<String, Double> getOccupancy() {
 		statisticsReference.child("concurrent")
 				.addListenerForSingleValueEvent(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
-			}
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
+					}
 
-			@Override
-			public void onCancelled(DatabaseError databaseError) {
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
 
-			}
-		});
+					}
+				});
 		return occupancyData;
 	}
 
@@ -274,6 +282,11 @@ public class ServerUtil {
 	 * @param parkingRows : All "ParkingRow"s to be added to this class
 	 */
 	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
+		// ToDo: Special case: null && null
+		if (parkingLots == null && parkingRows == null) {
+			ServerUtil.parkingLots = new ParkingLot[0];
+			ServerUtil.parkingRows = new ParkingRow[0];
+		}
 		ServerUtil.parkingLots = parkingLots;
 		ServerUtil.parkingRows = parkingRows;
 	}
