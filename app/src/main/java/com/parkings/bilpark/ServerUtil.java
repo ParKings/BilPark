@@ -1,5 +1,6 @@
 package com.parkings.bilpark;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -89,24 +90,23 @@ public class ServerUtil {
 		noOfSlots = i;
 
 		// Parked slot data retrieval listener.
-		parkedSlots = new ArrayList<>();
 		parkingDataReference.child("slots")
 				.orderByChild(ParkingSpot.isParkedTag).equalTo(true) // Those slots that are parked
 				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
-						// ToDo: Write the following retrieval line thoroughly. Currently wrong.
-						ArrayList<Object> x = dataSnapshot.getValue(ArrayList.class);
+						parkedSlots = new ArrayList<>();
+						for (int i = 0; i > noOfSlots; i++)
+							parkedSlots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
 					}
 
 					@Override
-					public void onCancelled(DatabaseError databaseError) {}
+					public void onCancelled(DatabaseError databaseError) {
+					}
 				});
-
 	}
 
 	// Static methods
-
 	/**
 	 * Parks the car and sends the parking data to the database. Includes the necessary algorithm
 	 * to park with a given latLng data. Updates the ParkingLot and ParkingSpace that has been
@@ -126,7 +126,7 @@ public class ServerUtil {
 	 * @return null, if no appropriate ParkingSlot is found;
 	 * LatLng object of the parked ParkingSlot, otherwise
 	 */
-	protected static LatLng park(LatLng latLng) {
+	protected static LatLng park(@NonNull LatLng latLng) {
 		// Incrementing in parking lot scale
 		for (ParkingLot parkingLot : parkingLots) {
 			if (parkingLot.contains(latLng) && !parkingLot.isFull()) {
@@ -169,7 +169,7 @@ public class ServerUtil {
 	 * @return null, if no appropriate ParkingSlot is found;
 	 * LatLng object of the unparked ParkingSlot, otherwise
 	 */
-	protected static LatLng unpark(LatLng latLng) {
+	protected static LatLng unpark(@NonNull LatLng latLng) {
 		// Decreasing in parking lot scale
 		for (ParkingLot parkingLot : parkingLots) {
 			if (parkingLot.contains(latLng) && !parkingLot.isEmpty()) {
@@ -214,7 +214,7 @@ public class ServerUtil {
 	 *
 	 * @param complaintBody The complaint body.
 	 */
-	protected static void sendComplaint(String complaintBody) {
+	protected static void sendComplaint(@NonNull String complaintBody) {
 		complaintsReference.child("apprelated").push().setValue(complaintBody);
 	}
 
@@ -224,7 +224,7 @@ public class ServerUtil {
 	 * @param complaintBody  The complaint body.
 	 * @param relatedLotName The name of the lot related to the complaint.
 	 */
-	protected static void sendComplaint(String complaintBody, String relatedLotName) {
+	protected static void sendComplaint(@NonNull String complaintBody, @NonNull String relatedLotName) {
 		complaintsReference.child("userrelated").push()
 				.setValue(new Complaint(complaintBody, relatedLotName));
 	}
@@ -236,7 +236,7 @@ public class ServerUtil {
 	 * @param periodType The period type, namely "Daily", "Weekly" or "Monthly".
 	 * @return A map mapping occupancy ratios (data) to predetermined String key values.
 	 */
-	protected static ConcurrentHashMap<String, Double> getStatistics(String lotName, String periodType) {
+	protected static ConcurrentHashMap<String, Double> getStatistics(@NonNull String lotName, @NonNull String periodType) {
 		statisticsReference.child(lotName).child(periodType)
 				.addListenerForSingleValueEvent(new ValueEventListener() {
 					@Override
@@ -304,6 +304,7 @@ public class ServerUtil {
 	 *
 	 * @return The formatted string for current time
 	 */
+	@SuppressWarnings("unused") // Yeah, we know, thou hadn't used yet.
 	private static String getTime() {
 		return new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss", Locale.ENGLISH)
 				.format(Calendar.getInstance().getTime());
