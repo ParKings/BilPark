@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity
 	boolean cameraClicked;
 	boolean polygonClicked;
 	private Fragment fragment;
+	Polygon nanotamPolygon;
+	Marker nanotamMarker;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -114,6 +116,7 @@ public class MainActivity extends AppCompatActivity
 			drawer.closeDrawer(GravityCompat.START);
 		} else if (polygonClicked) {
 			getUserLocation();
+			addPolygon("nanotam");
 			polygonClicked = false;
 		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
 			finish();
@@ -209,13 +212,43 @@ public class MainActivity extends AppCompatActivity
 		mapClicked = false;
 	}
 
+	public void addPolygon( String tag ) {
+		if ( tag.equals("nanotam") ) {
+			nanotamPolygon = mMap.addPolygon(new PolygonOptions()
+					.add(
+							new LatLng(39.86643115675040, 32.74708114564418),
+							new LatLng(39.86654052536382, 32.74778019636869),
+							new LatLng(39.86715298637697, 32.74763870984316),
+							new LatLng(39.86722426824893, 32.74693094193936))
+					.strokeColor(Color.BLACK)
+					.fillColor(Color.GRAY)
+					.strokeWidth(10)
+					.clickable(true));
+			nanotamPolygon.setTag("nanotam");
+			nanotamMarker.showInfoWindow();
+		}
+	}
+
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 		// gets called once when map is ready to be loaded
 		mMap = googleMap;
 		mapClicked = false;
 		cameraClicked = false;
+		polygonClicked = false;
 
+		mMap.setLatLngBoundsForCameraTarget( new LatLngBounds(
+				new LatLng(39.864870, 32.746315),
+				new LatLng(39.872084, 32.752667)));
+		//mMap.setMaxZoomPreference(4f);
+		mMap.setMinZoomPreference(16f);
+		CameraPosition cameraPosition = new CameraPosition.Builder()
+				.target(new LatLng(39.868593, 32.748719))      // Sets the center of the map to Mountain View
+				.zoom(16)                  // Sets the zoom
+				.bearing(180f)                // Sets the orientation of the camera to east
+				//.tilt(30)                // Sets the tilt of the camera to 30 degrees
+				.build();                  // Creates a CameraPosition from the builder
+		mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 		BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.quantum_ic_keyboard_arrow_down_white_36);
 		Bitmap b = bitmapdraw.getBitmap();
 		Bitmap smallMarker = Bitmap.createScaledBitmap(b, 1, 1, false);
@@ -224,39 +257,38 @@ public class MainActivity extends AppCompatActivity
 				new LatLng(39.866421, 32.746917),       // South west corner
 				new LatLng(39.867235, 32.747752));      // North east corner
 
-		GroundOverlayOptions nanotam = new GroundOverlayOptions()
+		final GroundOverlayOptions nanotam = new GroundOverlayOptions()
 				.image(BitmapDescriptorFactory.fromResource(R.raw.nanotam))
 				.positionFromBounds(nanotamBounds)
 				.transparency(0f);
 
 		GroundOverlay nanotamOverlay = mMap.addGroundOverlay(nanotam);
 
-		final Marker nanotamMarker = mMap.addMarker(
+		nanotamMarker = mMap.addMarker(
 				new MarkerOptions().position(
 						new LatLng(39.86685447665023, 32.74732355028391))
 						.title("%46").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
-
+		nanotamMarker.setTag("nanotamMarker");
 		nanotamMarker.showInfoWindow();
 
-		final Polygon nanotamPolygon = mMap.addPolygon(new PolygonOptions()
-				.add(
-						new LatLng(39.86643115675040, 32.74708114564418),
-						new LatLng(39.86654052536382, 32.74778019636869),
-						new LatLng(39.86715298637697, 32.74763870984316),
-						new LatLng(39.86722426824893, 32.74693094193936))
-				.strokeColor(Color.BLACK)
-				.fillColor(Color.GRAY)
-				.strokeWidth(10)
-				.clickable(true));
-
-		nanotamPolygon.setTag("nanotam");
+		addPolygon("nanotam");
 
 		mMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
 			@Override
 			public void onPolygonClick(Polygon polygon) {
 				polygonClicked = true;
+				mapClicked = true;
+				Log.i("POLYGON CLICKLENDI", "IF'IN DISI");
 				if (polygon.getTag().equals("nanotam")) {
+					Log.i("POLYGON CLICKLENDI", "IF'IN ICI");
 					nanotamPolygon.remove();
+					CameraPosition cameraPosition = new CameraPosition.Builder()
+							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
+							.zoom(19)                  // Sets the zoom
+							.bearing(180f)                // Sets the orientation of the camera to east
+							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
+							.build();                  // Creates a CameraPosition from the builder
+					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 				}
 			}
 		});
@@ -267,6 +299,7 @@ public class MainActivity extends AppCompatActivity
 			public void onClick(View view) {
 				getUserLocation();
 				polygonClicked = false;
+				addPolygon("nanotam" );
 			}
 		});
 
@@ -317,6 +350,7 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onMapClick(LatLng latLng) {
 				Log.i("MAP", latLng.toString());
+				nanotamMarker.showInfoWindow();
 				mapClicked = true;
 			}
 		});
@@ -333,7 +367,18 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public boolean onMarkerClick(Marker marker) {
 				Log.i("MARKER", "CLICKLENDI");
+				polygonClicked = true;
 				mapClicked = true;
+				if ( marker.getTag().equals("nanotamMarker") ) {
+					CameraPosition cameraPosition = new CameraPosition.Builder()
+							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
+							.zoom(19)                  // Sets the zoom
+							.bearing(180f)                // Sets the orientation of the camera to east
+							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
+							.build();                  // Creates a CameraPosition from the builder
+					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					nanotamPolygon.remove();
+				}
 				return true;
 			}
 		});

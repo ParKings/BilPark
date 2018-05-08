@@ -1,5 +1,8 @@
 package com.parkings.bilpark;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,7 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Listener for getParked() method; initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
+ * ToDo: Listener for getParked() method
+ * ToDo: Initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
  * </p>
  * <p>
  * <b>Implementation note:</b> ArrayList used might not be thread-safe. Find a better alternative.
@@ -25,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes code written by Uğur Yılmaz on 15.04.2018 (Park method and the constructor).
  * </p>
+ *
  * @author Emre Acarturk
  * @version 2018.04.25.0
  */
@@ -34,6 +39,7 @@ public class ServerUtil {
 	private static final DatabaseReference statisticsReference;
 	private static final DatabaseReference parkingDataReference;
 	private static final DatabaseReference complaintsReference;
+	private static final int noOfSlots;
 
 	private static final String statisticsTag  = "statistics";
 	private static final String parkingDataTag = "parkingdata";
@@ -81,28 +87,26 @@ public class ServerUtil {
 			}
 			i++;
 		}
+		noOfSlots = i;
 
 		// Parked slot data retrieval listener.
-		parkedSlots = new ArrayList<>();
 		parkingDataReference.child("slots")
 				.orderByChild(ParkingSpot.isParkedTag).equalTo(true) // Those slots that are parked
 				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
-						// ToDo: Write the following retrieval line thoroughly. Currently wrong.
-						parkedSlots = dataSnapshot.getValue(ArrayList.class);
+						parkedSlots = new ArrayList<>();
+						for (int i = 0; i > noOfSlots; i++)
+							parkedSlots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
 					}
 
 					@Override
 					public void onCancelled(DatabaseError databaseError) {
-
 					}
 				});
-
 	}
 
 	// Static methods
-
 	/**
 	 * Parks the car and sends the parking data to the database. Includes the necessary algorithm
 	 * to park with a given latLng data. Updates the ParkingLot and ParkingSpace that has been
@@ -122,7 +126,7 @@ public class ServerUtil {
 	 * @return null, if no appropriate ParkingSlot is found;
 	 * LatLng object of the parked ParkingSlot, otherwise
 	 */
-	protected static LatLng park(LatLng latLng) {
+	protected static LatLng park(@NonNull LatLng latLng) {
 		// Incrementing in parking lot scale
 		for (ParkingLot parkingLot : parkingLots) {
 			if (parkingLot.contains(latLng) && !parkingLot.isFull()) {
@@ -134,8 +138,8 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && parkingSpot.getParkDate().equals("")) {
-					parkingSpot.park(getTime());
+				if (parkingSpot.contains(latLng) && !parkingSpot.isParked()) {
+					parkingSpot.park();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
 				}
@@ -165,7 +169,7 @@ public class ServerUtil {
 	 * @return null, if no appropriate ParkingSlot is found;
 	 * LatLng object of the unparked ParkingSlot, otherwise
 	 */
-	protected static LatLng unpark(LatLng latLng) {
+	protected static LatLng unpark(@NonNull LatLng latLng) {
 		// Decreasing in parking lot scale
 		for (ParkingLot parkingLot : parkingLots) {
 			if (parkingLot.contains(latLng) && !parkingLot.isEmpty()) {
@@ -177,7 +181,7 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && !parkingSpot.getParkDate().equals("")) {
+				if (parkingSpot.contains(latLng) && parkingSpot.isParked()) {
 					parkingSpot.unpark();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
@@ -210,7 +214,7 @@ public class ServerUtil {
 	 *
 	 * @param complaintBody The complaint body.
 	 */
-	protected static void sendComplaint(String complaintBody) {
+	protected static void sendComplaint(@NonNull String complaintBody) {
 		complaintsReference.child("apprelated").push().setValue(complaintBody);
 	}
 
@@ -220,7 +224,7 @@ public class ServerUtil {
 	 * @param complaintBody  The complaint body.
 	 * @param relatedLotName The name of the lot related to the complaint.
 	 */
-	protected static void sendComplaint(String complaintBody, String relatedLotName) {
+	protected static void sendComplaint(@NonNull String complaintBody, @NonNull String relatedLotName) {
 		complaintsReference.child("userrelated").push()
 				.setValue(new Complaint(complaintBody, relatedLotName));
 	}
@@ -232,7 +236,7 @@ public class ServerUtil {
 	 * @param periodType The period type, namely "Daily", "Weekly" or "Monthly".
 	 * @return A map mapping occupancy ratios (data) to predetermined String key values.
 	 */
-	protected static ConcurrentHashMap<String, Double> getStatistics(String lotName, String periodType) {
+	protected static ConcurrentHashMap<String, Double> getStatistics(@NonNull String lotName, @NonNull String periodType) {
 		statisticsReference.child(lotName).child(periodType)
 				.addListenerForSingleValueEvent(new ValueEventListener() {
 					@Override
@@ -261,16 +265,16 @@ public class ServerUtil {
 	protected static ConcurrentHashMap<String, Double> getOccupancy() {
 		statisticsReference.child("concurrent")
 				.addListenerForSingleValueEvent(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
-			}
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
+					}
 
-			@Override
-			public void onCancelled(DatabaseError databaseError) {
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
 
-			}
-		});
+					}
+				});
 		return occupancyData;
 	}
 
@@ -281,8 +285,18 @@ public class ServerUtil {
 	 * @param parkingRows : All "ParkingRow"s to be added to this class
 	 */
 	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
-		ServerUtil.parkingLots = parkingLots;
-		ServerUtil.parkingRows = parkingRows;
+		// ToDo: Special case: null && null
+		if (parkingLots == null && parkingRows == null) {
+			ServerUtil.parkingLots = new ParkingLot[1];
+			ServerUtil.parkingLots[0] = new ParkingLot(1, new LatLng[0], nanotamLotTag);
+			ServerUtil.parkingRows = new ParkingRow[1];
+			ServerUtil.parkingRows[0] = new ParkingRow(0, new LatLng[0]);
+
+			Log.i("CHECK_FOR_NPE", ServerUtil.parkingLots + " & " + ServerUtil.parkingRows);
+		} else {
+			ServerUtil.parkingLots = parkingLots;
+			ServerUtil.parkingRows = parkingRows;
+		}
 	}
 
 	/**
@@ -290,6 +304,7 @@ public class ServerUtil {
 	 *
 	 * @return The formatted string for current time
 	 */
+	@SuppressWarnings("unused") // Yeah, we know, thou hadn't used yet.
 	private static String getTime() {
 		return new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss", Locale.ENGLISH)
 				.format(Calendar.getInstance().getTime());
