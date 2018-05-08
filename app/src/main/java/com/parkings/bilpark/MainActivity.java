@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity
 	boolean mapClicked;
 	boolean cameraClicked;
 	boolean polygonClicked;
+	private Fragment fragment;
 	Polygon nanotamPolygon;
 	Marker nanotamMarker;
 
@@ -117,6 +118,8 @@ public class MainActivity extends AppCompatActivity
 			getUserLocation();
 			addPolygon("nanotam");
 			polygonClicked = false;
+		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
+			finish();
 		} else {
 			super.onBackPressed();
 		}
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item) {
 		// Handle navigation view item clicks here.
-		Fragment fragment = null;
+		fragment = null;
 		int id = item.getItemId();
 		android.support.v4.app.FragmentManager supportFragmentManager = getSupportFragmentManager();
 		if (supportMapFragment.isAdded()) {
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity
 				supportFragmentManager.beginTransaction().show(supportMapFragment).commit();
 			}
 		} else if (id == R.id.nav_statistics) {
-			fragment = new StatisticsFragment();
+			fragment = new StatisticsMain();
 		} else if (id == R.id.nav_complaints) {
 			fragment = new ComplaintsFragment();
 		} else if (id == R.id.nav_aboutus) {
