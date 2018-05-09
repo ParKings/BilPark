@@ -3,7 +3,14 @@ package com.parkings.bilpark;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * LotStatistics class
+ * which obtains daily, weekly and monthly
+ * information about the specified parking lot.
+ *
  * Created by furkan on 28.04.2018
+ *
+ * @author furkan
+ * @version 2018.04.28.0
  */
 public class LotStatistics {
 
@@ -25,6 +32,7 @@ public class LotStatistics {
     }
 
     //methods
+
     /**
      * Receives daily statistics of particular parking lot
      * and obtains such statistics from the server

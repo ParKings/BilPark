@@ -31,7 +31,7 @@ public class ComplaintsFragment extends Fragment {
 		view.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Toast.makeText(getActivity(), "naber", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), "test", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
