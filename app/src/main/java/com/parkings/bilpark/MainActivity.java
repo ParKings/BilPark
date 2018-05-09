@@ -202,6 +202,11 @@ public class MainActivity extends AppCompatActivity
 	public void getUserLocation() {
 		Log.i("KONUM", "ISTENDI");
 		//mMap.clear();
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+
+			ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+					1 );
+		}
 		lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (lastKnownLocation != null) {
 			userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
