@@ -42,12 +42,12 @@ public class ParkingSpot {
 		center = new LatLng(
 				(corners[2].latitude
 						+ corners[3].latitude
-						+ ((corners[1].latitude - corners[2].latitude) / 3)
-						+ ((corners[0].latitude - corners[3].latitude) / 3)) / 2,
+						+ (Math.abs(corners[1].latitude - corners[2].latitude) / 3)
+						+ (Math.abs(corners[0].latitude - corners[3].latitude) / 3)) / 2,
 				(corners[2].longitude
 						+ corners[3].longitude
-						+ ((corners[1].longitude - corners[2].longitude) / 3)
-						+ ((corners[0].longitude - corners[3].longitude) / 3)) / 2);
+						+ (Math.abs(corners[1].longitude - corners[2].longitude) / 3)
+						+ (Math.abs(corners[0].longitude - corners[3].longitude) / 3)) / 2);
 		isParked = false;
 	}
 

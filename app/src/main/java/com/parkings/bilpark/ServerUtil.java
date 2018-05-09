@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <p>
+ * <p> 148
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
  * ToDo: Listener for getParked() method
@@ -50,8 +50,8 @@ public class ServerUtil {
 	public static final String mescidLotTag  = "mescid";
 
 	// Properties
-	private static ParkingLot[] parkingLots;
-	private static ParkingRow[] parkingRows;
+	private static ArrayList<ParkingLot> parkingLots = new ArrayList<ParkingLot>();
+	private static ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
 	private static ConcurrentHashMap<String, Double> occupancyData;
 	private static ConcurrentHashMap<String, Double> statisticsData;
 	private static ArrayList<ParkingSpot> parkedSlots;
@@ -67,7 +67,7 @@ public class ServerUtil {
 		DatabaseReference rootReference = firebaseDatabase.getReference();
 
 		// ToDo: Build the necessary lots & rows. Then add them.
-		initLotsAndRows(null, null);
+		initLotsAndRows();
 
 		// Main children, from root
 		statisticsReference = rootReference.child(statisticsTag);
@@ -198,8 +198,8 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	protected static ArrayList<ParkingSpot> getParked() {
-		return parkedSlots;
+	protected static ParkingSpot[] getParked() {
+		return (ParkingSpot[]) parkedSlots.toArray();
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class ServerUtil {
 	 *
 	 * @return all ParkingLots
 	 */
-	protected static ParkingLot[] getParkingLots() { return parkingLots; }
+	protected static ParkingLot[] getParkingLots() { return (ParkingLot[]) parkingLots.toArray(); }
 
 	/**
 	 * Sends the app-related complaint to the server.
@@ -280,23 +280,17 @@ public class ServerUtil {
 
 	/**
 	 * Initializer.
-	 *
-	 * @param parkingLots : All "ParkingLot"s to be added to this class
-	 * @param parkingRows : All "ParkingRow"s to be added to this class
 	 */
-	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
+	private static void initLotsAndRows() {
 		// ToDo: Special case: null && null
-		if (parkingLots == null && parkingRows == null) {
-			ServerUtil.parkingLots = new ParkingLot[1];
-			ServerUtil.parkingLots[0] = new ParkingLot(1, new LatLng[0], nanotamLotTag);
-			ServerUtil.parkingRows = new ParkingRow[1];
-			ServerUtil.parkingRows[0] = new ParkingRow(0, new LatLng[0]);
-
-			Log.i("CHECK_FOR_NPE", ServerUtil.parkingLots + " & " + ServerUtil.parkingRows);
-		} else {
-			ServerUtil.parkingLots = parkingLots;
-			ServerUtil.parkingRows = parkingRows;
-		}
+		parkingLots.add(new ParkingLot(148, new LatLng[] {new LatLng(39.86643115675040, 32.74708114564418),
+				new LatLng(39.86654052536382, 32.74778019636869),
+				new LatLng(39.86715298637697, 32.74763870984316),
+				new LatLng(39.86722426824893, 32.74693094193936)}, nanotamLotTag));
+		parkingRows.add(new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+				new LatLng(39.866530, 32.747152),
+				new LatLng(39.866542, 32.747316),
+				new LatLng(39.867104, 32.747219)}));
 	}
 
 	/**
