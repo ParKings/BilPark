@@ -1,7 +1,6 @@
 package com.parkings.bilpark;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -15,12 +14,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <p> 148
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Listener for getParked() method
+ * ToDo: Listener for getParkingSpots() method
  * ToDo: Initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
  * </p>
  * <p>
@@ -54,7 +54,7 @@ public class ServerUtil {
 	private static ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
 	private static ConcurrentHashMap<String, Double> occupancyData;
 	private static ConcurrentHashMap<String, Double> statisticsData;
-	private static ArrayList<ParkingSpot> parkedSlots;
+	private static CopyOnWriteArrayList<ParkingSpot> slots;
 
 	// Static initializer
 	static {
@@ -91,13 +91,13 @@ public class ServerUtil {
 
 		// Parked slot data retrieval listener.
 		parkingDataReference.child("slots")
-				.orderByChild(ParkingSpot.isParkedTag).equalTo(true) // Those slots that are parked
+				.orderByChild(ParkingSpot.isParkedTag)
 				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
-						parkedSlots = new ArrayList<>();
+						slots = new CopyOnWriteArrayList<>();
 						for (int i = 0; i > noOfSlots; i++)
-							parkedSlots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
+							slots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
 					}
 
 					@Override
@@ -198,8 +198,8 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	protected static ParkingSpot[] getParked() {
-		return (ParkingSpot[]) parkedSlots.toArray();
+	protected static CopyOnWriteArrayList<ParkingSpot> getParkingSpots() {
+		return slots;
 	}
 
 	/**

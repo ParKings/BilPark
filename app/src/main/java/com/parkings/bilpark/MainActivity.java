@@ -44,6 +44,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * This is the main "Park" activity; the starting point of our application.
@@ -395,5 +400,26 @@ public class MainActivity extends AppCompatActivity
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 			}
 		}
+
+		// Parking slot ground overlay listener
+		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
+				.addChildEventListener(new ChildEventListener() {
+					@Override
+					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+						// repaint. getParkingSpots();
+					}
+
+					@Override
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
+
+					@Override
+					public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+					@Override
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+					@Override
+					public void onCancelled(DatabaseError databaseError) {}
+				});
 	}
 }

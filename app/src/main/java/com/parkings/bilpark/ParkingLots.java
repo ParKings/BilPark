@@ -55,7 +55,7 @@ public class ParkingLots {
 		// Parking to a ParkingSlot
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(location) /*&& !parkingSpot.getParked(null)*/) {
+				if (parkingSpot.contains(location) /*&& !parkingSpot.getParkingSpots(null)*/) {
 					/*parkingSpot.setParked(true);*/
 					return parkingSpot.getCenter();
 				}
@@ -74,7 +74,7 @@ public class ParkingLots {
 		// Unparking to a ParkingSlot
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(location) /*&& parkingSpot.getParked()*/) {
+				if (parkingSpot.contains(location) /*&& parkingSpot.getParkingSpots()*/) {
 					/*parkingSpot.setParked(false);*/
 					return parkingSpot.getCenter();
 				}
