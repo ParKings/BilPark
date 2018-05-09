@@ -1,5 +1,7 @@
 package com.parkings.bilpark;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,10 +16,11 @@ import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <p>
+ * <p> 148
  * Includes methods providing the app with connectivity to the Firebase services.
  * Created on 2018.04.20 by Emre Acarturk.
- * ToDo: Listener for getParked() method; initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
+ * ToDo: Listener for getParked() method
+ * ToDo: Initializer of 'ParkingRow's and 'ParkingLot's (initLotsAndRows()).
  * </p>
  * <p>
  * <b>Implementation note:</b> ArrayList used might not be thread-safe. Find a better alternative.
@@ -25,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * Includes code written by Uğur Yılmaz on 15.04.2018 (Park method and the constructor).
  * </p>
+ *
  * @author Emre Acarturk
  * @version 2018.04.25.0
  */
@@ -34,6 +38,7 @@ public class ServerUtil {
 	private static final DatabaseReference statisticsReference;
 	private static final DatabaseReference parkingDataReference;
 	private static final DatabaseReference complaintsReference;
+	private static final int noOfSlots;
 
 	private static final String statisticsTag  = "statistics";
 	private static final String parkingDataTag = "parkingdata";
@@ -44,8 +49,8 @@ public class ServerUtil {
 	public static final String mescidLotTag  = "mescid";
 
 	// Properties
-	private static ParkingLot[] parkingLots;
-	private static ParkingRow[] parkingRows;
+	private static ArrayList<ParkingLot> parkingLots = new ArrayList<ParkingLot>();
+	private static ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
 	private static ConcurrentHashMap<String, Double> occupancyData;
 	private static ConcurrentHashMap<String, Double> statisticsData;
 	private static ArrayList<ParkingSpot> parkedSlots;
@@ -61,7 +66,7 @@ public class ServerUtil {
 		DatabaseReference rootReference = firebaseDatabase.getReference();
 
 		// ToDo: Build the necessary lots & rows. Then add them.
-		initLotsAndRows(null, null);
+		initLotsAndRows();
 
 		// Main children, from root
 		statisticsReference = rootReference.child(statisticsTag);
@@ -81,6 +86,7 @@ public class ServerUtil {
 			}
 			i++;
 		}
+		noOfSlots = i;
 
 		// Parked slot data retrieval listener.
 		parkedSlots = new ArrayList<>();
@@ -90,13 +96,11 @@ public class ServerUtil {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
 						// ToDo: Write the following retrieval line thoroughly. Currently wrong.
-						parkedSlots = dataSnapshot.getValue(ArrayList.class);
+						ArrayList<Object> x = dataSnapshot.getValue(ArrayList.class);
 					}
 
 					@Override
-					public void onCancelled(DatabaseError databaseError) {
-
-					}
+					public void onCancelled(DatabaseError databaseError) {}
 				});
 
 	}
@@ -134,8 +138,8 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && parkingSpot.getParkDate().equals("")) {
-					parkingSpot.park(getTime());
+				if (parkingSpot.contains(latLng) && !parkingSpot.isParked()) {
+					parkingSpot.park();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
 				}
@@ -177,7 +181,7 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				if (parkingSpot.contains(latLng) && !parkingSpot.getParkDate().equals("")) {
+				if (parkingSpot.contains(latLng) && parkingSpot.isParked()) {
 					parkingSpot.unpark();
 					parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 					return parkingSpot.getCenter();
@@ -194,9 +198,16 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	protected static ArrayList<ParkingSpot> getParked() {
-		return parkedSlots;
+	protected static ParkingSpot[] getParked() {
+		return (ParkingSpot[]) parkedSlots.toArray();
 	}
+
+	/**
+	 * Returns all ParkingLots
+	 *
+	 * @return all ParkingLots
+	 */
+	protected static ParkingLot[] getParkingLots() { return (ParkingLot[]) parkingLots.toArray(); }
 
 	/**
 	 * Sends the app-related complaint to the server.
@@ -254,28 +265,32 @@ public class ServerUtil {
 	protected static ConcurrentHashMap<String, Double> getOccupancy() {
 		statisticsReference.child("concurrent")
 				.addListenerForSingleValueEvent(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
-			}
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);
+					}
 
-			@Override
-			public void onCancelled(DatabaseError databaseError) {
+					@Override
+					public void onCancelled(DatabaseError databaseError) {
 
-			}
-		});
+					}
+				});
 		return occupancyData;
 	}
 
 	/**
 	 * Initializer.
-	 *
-	 * @param parkingLots : All "ParkingLot"s to be added to this class
-	 * @param parkingRows : All "ParkingRow"s to be added to this class
 	 */
-	private static void initLotsAndRows(ParkingLot[] parkingLots, ParkingRow[] parkingRows) {
-		ServerUtil.parkingLots = parkingLots;
-		ServerUtil.parkingRows = parkingRows;
+	private static void initLotsAndRows() {
+		// ToDo: Special case: null && null
+		parkingLots.add(new ParkingLot(148, new LatLng[] {new LatLng(39.86643115675040, 32.74708114564418),
+				new LatLng(39.86654052536382, 32.74778019636869),
+				new LatLng(39.86715298637697, 32.74763870984316),
+				new LatLng(39.86722426824893, 32.74693094193936)}, nanotamLotTag));
+		parkingRows.add(new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+				new LatLng(39.866530, 32.747152),
+				new LatLng(39.866542, 32.747316),
+				new LatLng(39.867104, 32.747219)}));
 	}
 
 	/**
