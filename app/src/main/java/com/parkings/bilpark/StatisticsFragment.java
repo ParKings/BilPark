@@ -2,6 +2,8 @@ package com.parkings.bilpark;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +28,11 @@ import com.example.uur.bilpark.R;
 // IN FRAGMENTS USE getActivity() METHOD INSTEAD OF getApplicationContext() THAT YOU WOULD NORMALLY USE
 public class StatisticsFragment extends Fragment {
 
-    private ParkingLot[] lots;
+    //private ParkingLot[] lots;
     private String[] listOfLots;
     private ListView listView;
-    private LotStatistics lotStatistics;
     private ArrayAdapter<String> adapter;
+    private Fragment fragment;
 
     //methods
 
@@ -43,10 +45,14 @@ public class StatisticsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        lots = ServerUtil.getParkingLots();
-        listOfLots = new String[lots.length];
-        for(int i = 0; i < lots.length; i++)
-            listOfLots[i] = lots[i].getName();
+        //lots = ServerUtil.getParkingLots();
+        int amount = 3;
+        listOfLots = new String[/*lots.length*/amount];
+        listOfLots[0] = ServerUtil.nanotamLotTag;
+        listOfLots[1] = ServerUtil.unamLotTag;
+        listOfLots[2] = ServerUtil.mescidLotTag;
+        /*for(int i = 0; i < lots.length; i++)
+            listOfLots[i] = lots[i].getName();*/
     }
 
     /**
@@ -84,7 +90,12 @@ public class StatisticsFragment extends Fragment {
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int index, long id) {
-                lotStatistics = Statistics.getLot(lots[index]);
+                fragment = new DetailedStatisticsFragment(/*lots[index]*/);
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.statistics, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }

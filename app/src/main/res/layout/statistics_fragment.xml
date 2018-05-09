@@ -12,40 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="82dp"
-            android:layout_height="57dp"
-            android:paddingTop="8dp"
-            android:src="@drawable/statistics" />
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="left|center_vertical"
-            android:text="Statistics"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="25sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        android:background="@color/white"
-        android:orientation="horizontal">
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -56,12 +23,11 @@
             android:text="Click on a parking lot to display its statistics"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
@@ -75,8 +41,8 @@
             android:divider="@color/place_autocomplete_search_text"
             android:dividerHeight="2dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" >
-        </ListView>
+            android:layout_alignParentTop="true" />
 
     </LinearLayout>
+
 </LinearLayout>
