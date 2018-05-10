@@ -1,7 +1,14 @@
 package com.parkings.bilpark;
 
+import com.example.uur.bilpark.R;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
 
 /**
  * Created by uğur on 15.04.2018.
@@ -25,6 +32,7 @@ public class ParkingSpot {
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
+	public static HashMap<LatLng, GroundOverlayOptions> dots;
 
 	//constructors
 	/**
@@ -38,6 +46,7 @@ public class ParkingSpot {
 	 * @param corners The corners of this parking spot
 	 */
 	public ParkingSpot(LatLng[] corners) {
+		dots = new HashMap<>();
 		this.corners = corners;
 		center = new LatLng(
 				(corners[2].latitude
@@ -49,6 +58,13 @@ public class ParkingSpot {
 						+ (Math.abs(corners[1].longitude - corners[2].longitude) / 3)
 						+ (Math.abs(corners[0].longitude - corners[3].longitude) / 3)) / 2);
 		isParked = false;
+		LatLngBounds dotBounds = new LatLngBounds(
+				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
+				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
+		dots.put(center, new GroundOverlayOptions()
+				.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))
+				.positionFromBounds(dotBounds)
+				.transparency(0f));
 	}
 
 	//methods
@@ -93,6 +109,10 @@ public class ParkingSpot {
 	 */
 	public LatLng getCenter() {
 		return center;
+	}
+
+	public String toString() {
+		return ( "\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + isParked );
 	}
 
 	/**

@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.uur.bilpark.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -48,6 +49,9 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * This is the main "Park" activity; the starting point of our application.
@@ -75,6 +79,9 @@ public class MainActivity extends AppCompatActivity
 	private Fragment fragment;
 	Polygon nanotamPolygon;
 	Marker nanotamMarker;
+	Location parkLocation;
+	boolean userParked = false;
+	LatLng test;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -195,6 +202,19 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
+	private void parked( LatLng center ) {
+		LatLngBounds dotBounds = new LatLngBounds(
+				new LatLng(39.866421, 32.746917),       // South west corner
+				new LatLng(39.867235, 32.747752));      // North east corner
+
+		GroundOverlayOptions dot = new GroundOverlayOptions()
+				.image(BitmapDescriptorFactory.fromResource(R.raw.reddot))
+				.positionFromBounds(dotBounds)
+				.transparency(0f);
+
+		GroundOverlay dotOverlay = mMap.addGroundOverlay(dot);
+	}
+
 	/**
 	 * Refreshes the user location data
 	 */
@@ -312,6 +332,34 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
+		FloatingActionButton fab2 = findViewById(R.id.fab2);
+		fab2.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (ContextCompat.checkSelfPermission( MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+
+					ActivityCompat.requestPermissions( MainActivity.this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+							1 );
+				}
+				parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+				if (parkLocation != null && !userParked) {
+					userParked = true;
+					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+				}
+				//CHECK HERE
+				else if (parkLocation == null && !userParked) {
+					while ( parkLocation == null ) {
+						parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+					}
+					userParked = true;
+					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+				}
+				else {
+					Toast.makeText(MainActivity.this, "You are already parked", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+
 		//GETTING USERS LOCATION
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -403,6 +451,22 @@ public class MainActivity extends AppCompatActivity
 			} else {
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 			}
+		}
+
+		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+				new LatLng(39.866530, 32.747152),
+				new LatLng(39.866542, 32.747316),
+				new LatLng(39.867104, 32.747219)});
+		Log.d("TEST","TEST");
+
+		for ( ParkingSpot ps: testRow.parkingSpots ) {
+			Log.d("TEST\n\n", ps.toString());
+		}
+
+		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
+			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
+			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
+					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
 
 		// Parking slot ground overlay listener
