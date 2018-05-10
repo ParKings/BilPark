@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.uur.bilpark.R;
-
 /**
  * Created by uğur on 27.03.2018.
  */

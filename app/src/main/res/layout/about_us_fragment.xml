@@ -10,13 +10,12 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="246dp"
-        android:layout_marginEnd="163dp"
-        android:layout_marginStart="163dp"
-        android:layout_marginTop="246dp"
-        android:text="ABOUT_US_FRAGMENT"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="We are a group of developers from Bilkent University \n Group Members are: \n Emre Acarturk \n Furkan Turgut \n Altan Akat \n Ugur Yilmaz \n Yaman Yucel \n \n We hope that you liked our first app \n \n Do not forget to give feedback from Complaints "
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

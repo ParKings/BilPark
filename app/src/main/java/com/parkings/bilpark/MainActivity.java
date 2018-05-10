@@ -27,8 +27,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.example.uur.bilpark.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,6 +43,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Map;
 
 /**
  * This is the main "Park" activity; the starting point of our application.
@@ -71,6 +77,10 @@ public class MainActivity extends AppCompatActivity
 	private NavigationView navigationView;
 	Polygon nanotamPolygon;
 	Marker nanotamMarker;
+	Location parkLocation;
+	boolean userParked = false;
+	LatLng test;
+	private ServerUtil serverUtil;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -108,6 +118,8 @@ public class MainActivity extends AppCompatActivity
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
+
+		serverUtil = ServerUtil.getInstance();
 	}
 
 	@Override
@@ -205,12 +217,30 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
+	private void parked( LatLng center ) {
+		LatLngBounds dotBounds = new LatLngBounds(
+				new LatLng(39.866421, 32.746917),       // South west corner
+				new LatLng(39.867235, 32.747752));      // North east corner
+
+		GroundOverlayOptions dot = new GroundOverlayOptions()
+				.image(BitmapDescriptorFactory.fromResource(R.raw.reddot))
+				.positionFromBounds(dotBounds)
+				.transparency(0f);
+
+		GroundOverlay dotOverlay = mMap.addGroundOverlay(dot);
+	}
+
 	/**
 	 * Refreshes the user location data
 	 */
 	public void getUserLocation() {
 		Log.i("KONUM", "ISTENDI");
 		//mMap.clear();
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+
+			ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+					1 );
+		}
 		lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (lastKnownLocation != null) {
 			userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
@@ -399,5 +429,42 @@ public class MainActivity extends AppCompatActivity
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 			}
 		}
+
+		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+				new LatLng(39.866530, 32.747152),
+				new LatLng(39.866542, 32.747316),
+				new LatLng(39.867104, 32.747219)});
+		Log.d("TEST","TEST");
+
+		for ( ParkingSpot ps: testRow.parkingSpots ) {
+			Log.d("TEST\n\n", ps.toString());
+		}
+
+		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
+			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
+			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
+					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
+		}
+
+		// Parking slot ground overlay listener
+		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
+				.addChildEventListener(new ChildEventListener() {
+					@Override
+					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+						// repaint. getParkingSpots();
+					}
+
+					@Override
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
+
+					@Override
+					public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+					@Override
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+					@Override
+					public void onCancelled(DatabaseError databaseError) {}
+				});
 	}
 }
