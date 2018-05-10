@@ -22,7 +22,11 @@ public class ComplaintsFragment extends Fragment {
 	private RadioButton radiobutton2;
 	private EditText editComplaint;
 	private EditText editLot;
+	private ServerUtil serverUtil;
 
+	public ComplaintsFragment() {
+		serverUtil = ServerUtil.getInstance();
+	}
 
 	/* __________STUB__________ */
 	@Nullable
@@ -77,13 +81,13 @@ public class ComplaintsFragment extends Fragment {
                 complaintLot = editLot.getText().toString();
 			    if(radiobutton1.isChecked() && complaintBody != null && complaintLot != null)
                 {
-                    ServerUtil.sendComplaint(complaintBody,complaintLot);
+                    serverUtil.sendComplaint(complaintBody,complaintLot);
                     Toast.makeText(getActivity(), "Complaint is sent to us. A user reported", Toast.LENGTH_SHORT).show();
                 }
                 else if(radiobutton2.isChecked() && complaintBody != null)
                 {
 
-                    ServerUtil.sendComplaint(complaintBody);
+                    serverUtil.sendComplaint(complaintBody);
                     Toast.makeText(getActivity(), "Thanks for the feedback ", Toast.LENGTH_SHORT).show();
                 }
                 else
