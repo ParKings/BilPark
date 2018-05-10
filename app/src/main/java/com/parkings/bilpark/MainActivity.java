@@ -460,12 +460,12 @@ public class MainActivity extends AppCompatActivity
 		Log.d("TEST","TEST");
 
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
-			Log.d("TEST\n\n", ps.toString());
+			Log.d("TEST1\n\n", ps.toString());
 		}
 
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
-			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
+			Log.d("TEST2", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
 
