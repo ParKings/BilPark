@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity
 	Location parkLocation;
 	boolean userParked = false;
 	LatLng test;
+	ServerUtil serverUtil = new ServerUtil();
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -453,6 +454,8 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 
+		/**
+		 * THE CODE BELOW IS JUST FOR TESTING PURPOSES
 		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
@@ -468,6 +471,7 @@ public class MainActivity extends AppCompatActivity
 			Log.d("TEST2", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
+		 */
 
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
