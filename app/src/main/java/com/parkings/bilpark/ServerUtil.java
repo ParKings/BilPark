@@ -45,9 +45,9 @@ public class ServerUtil {
 	private static final String parkingDataTag = "parkingdata";
 	private static final String complaintsTag  = "complaints";
 
-	public static final String nanotamLotTag = "nanotam";
-	public static final String unamLotTag    = "unam";
-	public static final String mescidLotTag  = "mescid";
+	public static final String nanotamLotTag = "Nanotam";
+	public static final String unamLotTag    = "Unam";
+	public static final String mescidLotTag  = "Mescid";
 
 	// Properties
 	private static ArrayList<ParkingLot> parkingLots = new ArrayList<ParkingLot>();
