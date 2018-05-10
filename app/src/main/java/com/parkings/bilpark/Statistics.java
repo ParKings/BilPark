@@ -16,13 +16,13 @@ public class Statistics {
     //methods
 
     /**
-     * Receives the information of particular parking lot
+     * Receives the name of particular parking lot
      * so as to obtain the time statistics of that parking lot
      *
-     * @param lot
+     * @param lotName
      * @return LotStatistics
      */
-    protected static LotStatistics getLot(ParkingLot lot) {
-        return new LotStatistics(lot);
+    protected static LotStatistics getLotStatistics(String lotName) {
+        return new LotStatistics(lotName);
     }
 }
