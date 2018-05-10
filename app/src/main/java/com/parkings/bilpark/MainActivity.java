@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity
 	Location parkLocation;
 	boolean userParked = false;
 	LatLng test;
-	ServerUtil serverUtil = new ServerUtil();
+	private ServerUtil serverUtil;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -117,6 +117,8 @@ public class MainActivity extends AppCompatActivity
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
+
+		serverUtil = ServerUtil.getInstance();
 	}
 
 	@Override
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity
 				parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				if (parkLocation != null && !userParked) {
 					userParked = true;
-					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
 				}
 				//CHECK HERE
 				else if (parkLocation == null && !userParked) {
@@ -351,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 						parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 					}
 					userParked = true;
-					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
 				}
 				else {
 					Toast.makeText(MainActivity.this, "You are already parked", Toast.LENGTH_SHORT).show();
@@ -452,8 +454,6 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 
-		/**
-		 * THE CODE BELOW IS JUST FOR TESTING PURPOSES
 		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
@@ -461,15 +461,14 @@ public class MainActivity extends AppCompatActivity
 		Log.d("TEST","TEST");
 
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
-			Log.d("TEST1\n\n", ps.toString());
+			Log.d("TEST\n\n", ps.toString());
 		}
 
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
-			Log.d("TEST2", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
+			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
-		 */
 
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")

@@ -18,6 +18,7 @@ public class LotStatistics {
     private final String DAILY = "Daily";
     private final String WEEKLY = "Weekly";
     private final String MONTHLY = "Monthly";
+    private final ServerUtil serverUtil;
     private String lotName;
 
     //constructor
@@ -29,6 +30,7 @@ public class LotStatistics {
      */
     public LotStatistics(String lotName) {
         this.lotName = lotName;
+        serverUtil = ServerUtil.getInstance();
     }
 
     //methods
@@ -50,7 +52,7 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getDaily() {
-        return ServerUtil.getStatistics(lotName, DAILY);
+        return serverUtil.getStatistics(lotName, DAILY);
     }
 
     /**
@@ -60,7 +62,7 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getWeekly() {
-        return ServerUtil.getStatistics(lotName, WEEKLY);
+        return serverUtil.getStatistics(lotName, WEEKLY);
     }
 
     /**
@@ -70,6 +72,6 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getMonthly() {
-        return ServerUtil.getStatistics(lotName, MONTHLY);
+        return serverUtil.getStatistics(lotName, MONTHLY);
     }
 }
