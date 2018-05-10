@@ -30,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.uur.bilpark.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,7 +49,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -101,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		supportMapFragment = SupportMapFragment.newInstance();
 
-		setContentView(com.example.uur.bilpark.R.layout.activity_main);
+		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 

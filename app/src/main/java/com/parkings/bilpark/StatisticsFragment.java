@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import com.example.uur.bilpark.R;
 
 /**
  * StatisticsFragment class

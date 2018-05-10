@@ -11,8 +11,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.uur.bilpark.R;
-
 /**
  * Created by uğur on 27.03.2018.
  */
