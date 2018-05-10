@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -118,8 +119,6 @@ public class MainActivity extends AppCompatActivity
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
-
-		serverUtil = ServerUtil.getInstance();
 	}
 
 	@Override
@@ -429,23 +428,32 @@ public class MainActivity extends AppCompatActivity
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 			}
 		}
-
+		/*
 		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
 				new LatLng(39.867104, 32.747219)});
+			39.867069, 32.747314
+			39.866980, 32.747340
+			39.867003, 32.747375
+			39.867100, 32.747359
+		 */ // The following numbers ARE NOT CORRECT; for test only.
+		ParkingRow testRow = new ParkingRow(4, new LatLng[] {new LatLng(39.867069, 32.747314),
+				new LatLng(39.866980, 32.747340),
+				new LatLng(39.867003, 32.747375),
+				new LatLng(39.867100, 32.747359)});
 		Log.d("TEST","TEST");
 
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
 		}
-
+/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
 			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
-
+*/
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
 				.addChildEventListener(new ChildEventListener() {
@@ -466,5 +474,8 @@ public class MainActivity extends AppCompatActivity
 					@Override
 					public void onCancelled(DatabaseError databaseError) {}
 				});
+
+		MapsInitializer.initialize(getApplicationContext());
+		serverUtil = ServerUtil.getInstance();
 	}
 }

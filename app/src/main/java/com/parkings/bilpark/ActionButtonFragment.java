@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-import com.example.uur.bilpark.R;
-
 public class ActionButtonFragment extends Fragment {
 
 	//properties
