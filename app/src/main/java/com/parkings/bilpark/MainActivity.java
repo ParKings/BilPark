@@ -12,14 +12,13 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -68,7 +67,8 @@ public class MainActivity extends AppCompatActivity
 	boolean mapClicked;
 	boolean cameraClicked;
 	boolean polygonClicked;
-	private Fragment fragment;
+	private Fragment fragment, actionButton;
+	private NavigationView navigationView;
 	Polygon nanotamPolygon;
 	Marker nanotamMarker;
 
@@ -90,9 +90,10 @@ public class MainActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 		supportMapFragment = SupportMapFragment.newInstance();
 
-		setContentView(com.example.uur.bilpark.R.layout.activity_main);
+		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		actionButton = new ActionButtonFragment();
 
 		DrawerLayout drawer = findViewById(R.id.drawer_layout);
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity
 		drawer.addDrawerListener(toggle);
 		toggle.syncState();
 
-		NavigationView navigationView = findViewById(R.id.nav_view);
+		navigationView = findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
 		supportMapFragment.getMapAsync(this);
@@ -119,6 +120,9 @@ public class MainActivity extends AppCompatActivity
 			addPolygon("nanotam");
 			polygonClicked = false;
 		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
+			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
+			navigationView.getMenu().getItem(0).setChecked(true);
+		} else if (fragment == null) {
 			finish();
 		} else {
 			super.onBackPressed();
@@ -153,10 +157,12 @@ public class MainActivity extends AppCompatActivity
 		// Handle navigation view item clicks here.
 		fragment = null;
 		int id = item.getItemId();
-		android.support.v4.app.FragmentManager supportFragmentManager = getSupportFragmentManager();
+		FragmentManager supportFragmentManager = getSupportFragmentManager();
 		if (supportMapFragment.isAdded()) {
 			supportFragmentManager.beginTransaction().hide(supportMapFragment).commit();
 		}
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction;
 		if (id == R.id.nav_park) {
 			// handle the park fragment
 			if (!supportMapFragment.isAdded()) {
@@ -164,18 +170,26 @@ public class MainActivity extends AppCompatActivity
 			} else {
 				supportFragmentManager.beginTransaction().show(supportMapFragment).commit();
 			}
-		} else if (id == R.id.nav_statistics) {
-			fragment = new StatisticsMain();
-		} else if (id == R.id.nav_complaints) {
-			fragment = new ComplaintsFragment();
-		} else if (id == R.id.nav_aboutus) {
-			fragment = new AboutUsFragment();
-		}
-
-		if (fragment != null) {
-			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
+			if (fragment != null) {
+				fragmentTransaction = fragmentManager.beginTransaction();
+				fragmentTransaction.remove(fragment);
+				fragmentTransaction.commit();
+			}
+			fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.replace(R.id.floating_action_button, actionButton);
+			fragmentTransaction.commit();
+		} else {
+			if (id == R.id.nav_statistics) {
+				fragment = new StatisticsMain();
+			} else if (id == R.id.nav_complaints) {
+				fragment = new ComplaintsFragment();
+			} else if (id == R.id.nav_aboutus) {
+				fragment = new AboutUsFragment();
+			}
+			fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.remove(actionButton);
+			fragmentTransaction.commit();
+			fragmentTransaction = fragmentManager.beginTransaction();
 			fragmentTransaction.replace(R.id.map, fragment);
 			fragmentTransaction.commit();
 		}
@@ -290,16 +304,6 @@ public class MainActivity extends AppCompatActivity
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 				}
-			}
-		});
-
-		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				getUserLocation();
-				polygonClicked = false;
-				addPolygon("nanotam" );
 			}
 		});
 
