@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity
 	Location parkLocation;
 	boolean userParked = false;
 	LatLng test;
+	private ServerUtil serverUtil;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -116,6 +117,8 @@ public class MainActivity extends AppCompatActivity
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
+
+		serverUtil = ServerUtil.getInstance();
 	}
 
 	@Override
@@ -342,7 +345,7 @@ public class MainActivity extends AppCompatActivity
 				parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 				if (parkLocation != null && !userParked) {
 					userParked = true;
-					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
 				}
 				//CHECK HERE
 				else if (parkLocation == null && !userParked) {
@@ -350,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 						parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 					}
 					userParked = true;
-					test = ServerUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
+					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
 				}
 				else {
 					Toast.makeText(MainActivity.this, "You are already parked", Toast.LENGTH_SHORT).show();
