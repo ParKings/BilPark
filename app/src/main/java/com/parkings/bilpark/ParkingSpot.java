@@ -30,7 +30,7 @@ public class ParkingSpot {
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
-	public static HashMap<LatLng, GroundOverlayOptions> dots;
+	static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
 
 	//constructors
 	/**
@@ -44,7 +44,6 @@ public class ParkingSpot {
 	 * @param corners The corners of this parking spot
 	 */
 	public ParkingSpot(LatLng[] corners) {
-		dots = new HashMap<>();
 		this.corners = corners;
 		center = new LatLng(
 				(corners[2].latitude
