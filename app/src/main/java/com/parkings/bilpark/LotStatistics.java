@@ -18,20 +18,30 @@ public class LotStatistics {
     private final String DAILY = "Daily";
     private final String WEEKLY = "Weekly";
     private final String MONTHLY = "Monthly";
-    private ParkingLot lot;
+    private String lotName;
 
     //constructor
 
     /**
      * Default constructor
      *
-     * @param lot
+     * @param lotName
      */
-    public LotStatistics(ParkingLot lot) {
-        this.lot = lot;
+    public LotStatistics(String lotName) {
+        this.lotName = lotName;
     }
 
     //methods
+
+    /**
+     * Provides the type of schedules for
+     * DetailedStatisticsFragment class
+     *
+     * @return String[]
+     */
+    public String[] getScheduleTypes() {
+        return new String[] {DAILY, WEEKLY, MONTHLY};
+    }
 
     /**
      * Receives daily statistics of particular parking lot
@@ -40,7 +50,7 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getDaily() {
-        return ServerUtil.getStatistics(lot.getName(), DAILY);
+        return ServerUtil.getStatistics(lotName, DAILY);
     }
 
     /**
@@ -50,7 +60,7 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getWeekly() {
-        return ServerUtil.getStatistics(lot.getName(), WEEKLY);
+        return ServerUtil.getStatistics(lotName, WEEKLY);
     }
 
     /**
@@ -60,6 +70,6 @@ public class LotStatistics {
      * @return ConcurrentHashMap<String, Double>
      */
     public ConcurrentHashMap<String, Double> getMonthly() {
-        return ServerUtil.getStatistics(lot.getName(), MONTHLY);
+        return ServerUtil.getStatistics(lotName, MONTHLY);
     }
 }
