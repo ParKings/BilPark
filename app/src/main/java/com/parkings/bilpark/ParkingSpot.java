@@ -1,9 +1,6 @@
 package com.parkings.bilpark;
 
-import com.example.uur.bilpark.R;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -34,6 +31,7 @@ public class ParkingSpot {
 	@Exclude
 	private LatLng[] corners;
 	public static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
+  //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
 	static int counter = 0;
 
 	//constructors
@@ -63,6 +61,7 @@ public class ParkingSpot {
 		LatLngBounds dotBounds = new LatLngBounds(
 				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
 				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
+    //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
 		if ( counter < 36 && counter > 31 ) {
 			dots.put(center, new GroundOverlayOptions()
 					.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))

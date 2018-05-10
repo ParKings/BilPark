@@ -21,8 +21,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.uur.bilpark.R;
-
 
 /**
  * A simple {@link Fragment} subclass.
