@@ -13,7 +13,8 @@ public class Complaint {
 	/**
 	 * Default constructor needed for Firebase integration
 	 */
-	public Complaint() {}
+	public Complaint() {
+	}
 
 	/**
 	 * Secondary constructor initializing parameters.

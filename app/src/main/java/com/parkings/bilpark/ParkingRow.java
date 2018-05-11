@@ -19,6 +19,7 @@ public class ParkingRow {
 	ParkingSpot[] parkingSpots;
 
 	//constructor
+
 	/**
 	 * The constructor which constructs parking spots within a given parking row
 	 *

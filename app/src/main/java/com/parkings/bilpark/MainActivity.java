@@ -52,14 +52,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Map;
 
 /**
+ * <p>
  * This is the main "Park" activity; the starting point of our application.
  * Includes a map and related API tools for geolocating and putting markers.
- *
+ * </p><p>
  * All overridden and/or implemented methods' functionality should be checked
  * from the superclass's/interface's JavaDocs.
+ * </p><p>
+ * Last edited ny Emre Acarturk, on 11th of May, 2018.
+ * <p>
  *
  * @author Ugur
- * @version Initial release
+ * @version 2018.05.11.0
  */
 public class MainActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity
 			getUserLocation();
 			addPolygon("nanotam");
 			polygonClicked = false;
-		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
+		} else if (fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
 			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 			navigationView.getMenu().getItem(0).setChecked(true);
 		} else if (fragment == null) {
@@ -216,7 +220,7 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
-	private void parked( LatLng center ) {
+	private void parked(LatLng center) {
 		LatLngBounds dotBounds = new LatLngBounds(
 				new LatLng(39.866421, 32.746917),       // South west corner
 				new LatLng(39.867235, 32.747752));      // North east corner
@@ -235,10 +239,10 @@ public class MainActivity extends AppCompatActivity
 	public void getUserLocation() {
 		Log.i("KONUM", "ISTENDI");
 		//mMap.clear();
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-			ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-					1 );
+			ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+					1);
 		}
 		lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (lastKnownLocation != null) {
@@ -255,8 +259,8 @@ public class MainActivity extends AppCompatActivity
 		mapClicked = false;
 	}
 
-	public void addPolygon( String tag ) {
-		if ( tag.equals("nanotam") ) {
+	public void addPolygon(String tag) {
+		if (tag.equals("nanotam")) {
 			nanotamPolygon = mMap.addPolygon(new PolygonOptions()
 					.add(
 							new LatLng(39.86643115675040, 32.74708114564418),
@@ -280,7 +284,7 @@ public class MainActivity extends AppCompatActivity
 		cameraClicked = false;
 		polygonClicked = false;
 
-		mMap.setLatLngBoundsForCameraTarget( new LatLngBounds(
+		mMap.setLatLngBoundsForCameraTarget(new LatLngBounds(
 				new LatLng(39.864870, 32.746315),
 				new LatLng(39.872084, 32.752667)));
 		//mMap.setMaxZoomPreference(4f);
@@ -402,7 +406,7 @@ public class MainActivity extends AppCompatActivity
 				Log.i("MARKER", "CLICKLENDI");
 				polygonClicked = true;
 				mapClicked = true;
-				if ( marker.getTag().equals("nanotamMarker") ) {
+				if (marker.getTag().equals("nanotamMarker")) {
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
 							.zoom(19)                  // Sets the zoom
@@ -438,13 +442,13 @@ public class MainActivity extends AppCompatActivity
 			39.867003, 32.747375
 			39.867100, 32.747359
 		 */ // The following numbers ARE NOT CORRECT; for test only.
-		ParkingRow testRow = new ParkingRow(4, new LatLng[] {new LatLng(39.867069, 32.747314),
+		ParkingRow testRow = new ParkingRow(4, new LatLng[]{new LatLng(39.867069, 32.747314),
 				new LatLng(39.866980, 32.747340),
 				new LatLng(39.867003, 32.747375),
 				new LatLng(39.867100, 32.747359)});
-		Log.d("TEST","TEST");
+		Log.d("TEST", "TEST");
 
-		for ( ParkingSpot ps: testRow.parkingSpots ) {
+		for (ParkingSpot ps : testRow.parkingSpots) {
 			Log.d("TEST\n\n", ps.toString());
 		}
 /*
@@ -463,16 +467,20 @@ public class MainActivity extends AppCompatActivity
 					}
 
 					@Override
-					public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+					}
 
 					@Override
-					public void onChildRemoved(DataSnapshot dataSnapshot) {}
+					public void onChildRemoved(DataSnapshot dataSnapshot) {
+					}
 
 					@Override
-					public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+					}
 
 					@Override
-					public void onCancelled(DatabaseError databaseError) {}
+					public void onCancelled(DatabaseError databaseError) {
+					}
 				});
 
 		MapsInitializer.initialize(getApplicationContext());

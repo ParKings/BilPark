@@ -12,9 +12,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 /**
- * Created by uğur on 27.03.2018.
+ * Created by uğur on 27.03.2018. Opens up the complaints XML file and oversees
+ * functionality of the related buttons and text fields.
+ * <p>
+ * Extends Fragment, hence is bound to its related activity, i.e. MainActivity.
+ * <p>
+ * Last edited by Emre Acarturk. Added JavaDocs.
+ *
+ * @author Ugur
+ * @version 2018.05.11.0
  */
-
 public class ComplaintsFragment extends Fragment {
 
 	private RadioGroup radioComplaintGroup;
@@ -46,52 +53,48 @@ public class ComplaintsFragment extends Fragment {
 		editComplaint = view.findViewById(R.id.editText);
 		editLot = view.findViewById(R.id.editText2);
 		radiobutton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+			@Override
+			public void onClick(View v) {
 
 
-            }
-        });
-        radiobutton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+			}
+		});
+		radiobutton2.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
 
-            }
-        });
+			}
+		});
 
 		editComplaint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editComplaint.setText("");
-            }
-        });
-        editLot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editLot.setText("");
-            }
-        });
+			@Override
+			public void onClick(View v) {
+				editComplaint.setText("");
+			}
+		});
+		editLot.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				editLot.setText("");
+			}
+		});
 
 		view.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-			    String complaintBody;
-			    String complaintLot;
-			    complaintBody = editComplaint.getText().toString();
-                complaintLot = editLot.getText().toString();
-			    if(radiobutton1.isChecked() && complaintBody != null && complaintLot != null)
-                {
-                    serverUtil.sendComplaint(complaintBody,complaintLot);
-                    Toast.makeText(getActivity(), "Complaint is sent to us. A user reported", Toast.LENGTH_SHORT).show();
-                }
-                else if(radiobutton2.isChecked() && complaintBody != null)
-                {
+				String complaintBody;
+				String complaintLot;
+				complaintBody = editComplaint.getText().toString();
+				complaintLot = editLot.getText().toString();
+				if (radiobutton1.isChecked() && complaintBody != null && complaintLot != null) {
+					serverUtil.sendComplaint(complaintBody, complaintLot);
+					Toast.makeText(getActivity(), "Complaint is sent to us. A user reported", Toast.LENGTH_SHORT).show();
+				} else if (radiobutton2.isChecked() && complaintBody != null) {
 
-                    serverUtil.sendComplaint(complaintBody);
-                    Toast.makeText(getActivity(), "Thanks for the feedback ", Toast.LENGTH_SHORT).show();
-                }
-                else
-                    Toast.makeText(getActivity(), "Nothing sent", Toast.LENGTH_SHORT).show();
+					serverUtil.sendComplaint(complaintBody);
+					Toast.makeText(getActivity(), "Thanks for the feedback ", Toast.LENGTH_SHORT).show();
+				} else
+					Toast.makeText(getActivity(), "Nothing sent", Toast.LENGTH_SHORT).show();
 
 			}
 		});
