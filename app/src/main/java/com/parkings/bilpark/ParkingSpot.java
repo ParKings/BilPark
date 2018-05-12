@@ -1,9 +1,12 @@
 package com.parkings.bilpark;
 
+import android.graphics.Color;
+
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.firebase.database.Exclude;
 
 import java.util.HashMap;
@@ -23,7 +26,7 @@ import java.util.HashMap;
  */
 public class ParkingSpot {
 	//CORNERS ARE ASSIGNED IN COUNTERCLOCKWISE DIRECTION
-	//SIDE 03 AND 12 ARE LONGER ONES
+	//SIDE 12 AND 03 ARE LONGER ONES
 	//SIDE 01 AND 32 ARE SHORTER ONES
 	// Constants
 	@Exclude
@@ -39,6 +42,7 @@ public class ParkingSpot {
 	public static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
   //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
 	static int counter = 0;
+	static LatLng[][] polytest = new LatLng[17][4];
 
 	//constructors
 
@@ -54,6 +58,9 @@ public class ParkingSpot {
 	 * @param corners The corners of this parking spot
 	 */
 	public ParkingSpot(LatLng[] corners) {
+		if ( counter < 17 ) {
+			polytest[counter] = corners;
+		}
 		counter++;
 		this.corners = corners;
 		center = new LatLng(
@@ -71,7 +78,8 @@ public class ParkingSpot {
 				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
 				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
     //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
-		if ( counter < 36 && counter > 31 ) {
+
+		if ( ( counter <= 18 && counter > 16 ) || ( counter >= 0 && counter < 2 ) ) {
 			dots.put(center, new GroundOverlayOptions()
 					.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))
 					.positionFromBounds(dotBounds)

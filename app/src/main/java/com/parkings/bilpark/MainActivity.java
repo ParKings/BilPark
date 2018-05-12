@@ -34,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlay;
@@ -49,21 +50,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <p>
  * This is the main "Park" activity; the starting point of our application.
  * Includes a map and related API tools for geolocating and putting markers.
- * </p><p>
+ *
  * All overridden and/or implemented methods' functionality should be checked
  * from the superclass's/interface's JavaDocs.
- * </p><p>
- * Last edited ny Emre Acarturk, on 11th of May, 2018.
- * <p>
  *
  * @author Ugur
- * @version 2018.05.11.0
+ * @version Initial release
  */
 public class MainActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -80,12 +79,16 @@ public class MainActivity extends AppCompatActivity
 	boolean polygonClicked;
 	private Fragment fragment, actionButton;
 	private NavigationView navigationView;
-	Polygon nanotamPolygon;
-	Marker nanotamMarker;
+	private Polygon nanotamPolygon;
+	private Marker nanotamMarker;
 	Location parkLocation;
 	boolean userParked = false;
+	private Marker userMarker;
 	LatLng test;
 	private ServerUtil serverUtil;
+	private CopyOnWriteArrayList<ParkingSpot> slotsClone;
+	private HashMap<LatLng, GroundOverlay> redDots = new HashMap<>();
+	LatLng keyf;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -119,6 +122,7 @@ public class MainActivity extends AppCompatActivity
 		navigationView = findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
+		supportMapFragment.getMapAsync(this);
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
@@ -133,10 +137,7 @@ public class MainActivity extends AppCompatActivity
 			getUserLocation();
 			addPolygon("nanotam");
 			polygonClicked = false;
-		} else if (fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
-			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
-			navigationView.getMenu().getItem(0).setChecked(true);
-		} else if (fragment instanceof ComplaintsFragment || fragment instanceof AboutUsFragment) {
+		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
 			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 			navigationView.getMenu().getItem(0).setChecked(true);
 		} else if (fragment == null) {
@@ -182,7 +183,6 @@ public class MainActivity extends AppCompatActivity
 		FragmentTransaction fragmentTransaction;
 		if (id == R.id.nav_park) {
 			// handle the park fragment
-			supportMapFragment.getMapAsync(this);
 			if (!supportMapFragment.isAdded()) {
 				supportFragmentManager.beginTransaction().add(R.id.map, supportMapFragment).commit();
 			} else {
@@ -223,10 +223,10 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
-	private void parked(LatLng center) {
+	private void parked( LatLng center ) {
 		LatLngBounds dotBounds = new LatLngBounds(
-				new LatLng(39.866421, 32.746917),       // South west corner
-				new LatLng(39.867235, 32.747752));      // North east corner
+				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
+				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
 
 		GroundOverlayOptions dot = new GroundOverlayOptions()
 				.image(BitmapDescriptorFactory.fromResource(R.raw.reddot))
@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity
 				.transparency(0f);
 
 		GroundOverlay dotOverlay = mMap.addGroundOverlay(dot);
+		redDots.put( center, dotOverlay);
 	}
 
 	/**
@@ -242,10 +243,10 @@ public class MainActivity extends AppCompatActivity
 	public void getUserLocation() {
 		Log.i("KONUM", "ISTENDI");
 		//mMap.clear();
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
 
-			ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
-					1);
+			ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+					1 );
 		}
 		lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (lastKnownLocation != null) {
@@ -258,12 +259,23 @@ public class MainActivity extends AppCompatActivity
 					//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 					.build();                  // Creates a CameraPosition from the builder
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+			userMarker = mMap.addMarker(new MarkerOptions().
+					position(userLocation).
+					icon(BitmapDescriptorFactory.fromResource(R.drawable.baseline_navigation_black_48dp)));
 		}
 		mapClicked = false;
 	}
 
-	public void addPolygon(String tag) {
-		if (tag.equals("nanotam")) {
+	public void polyTest( LatLng one, LatLng two, LatLng three, LatLng four ) {
+		mMap.addPolygon(new PolygonOptions()
+				.add(one, two, three, four )
+				.strokeColor(Color.BLACK)
+				.fillColor(Color.GRAY)
+				.strokeWidth(10) );
+	}
+
+	public void addPolygon( String tag ) {
+		if ( tag.equals("nanotam") ) {
 			nanotamPolygon = mMap.addPolygon(new PolygonOptions()
 					.add(
 							new LatLng(39.86643115675040, 32.74708114564418),
@@ -287,7 +299,7 @@ public class MainActivity extends AppCompatActivity
 		cameraClicked = false;
 		polygonClicked = false;
 
-		mMap.setLatLngBoundsForCameraTarget(new LatLngBounds(
+		mMap.setLatLngBoundsForCameraTarget( new LatLngBounds(
 				new LatLng(39.864870, 32.746315),
 				new LatLng(39.872084, 32.752667)));
 		//mMap.setMaxZoomPreference(4f);
@@ -313,6 +325,7 @@ public class MainActivity extends AppCompatActivity
 				.transparency(0f);
 
 		GroundOverlay nanotamOverlay = mMap.addGroundOverlay(nanotam);
+
 
 		nanotamMarker = mMap.addMarker(
 				new MarkerOptions().position(
@@ -358,7 +371,7 @@ public class MainActivity extends AppCompatActivity
 					Log.i("TAYF", ".");
 					//mMap.clear();
 					userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-					//mMap.addMarker(new MarkerOptions().position(userLocation).title("Marker in Turkey"));
+
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(userLocation)      // Sets the center of the map to Mountain View
 							.zoom(16)                  // Sets the zoom
@@ -366,6 +379,7 @@ public class MainActivity extends AppCompatActivity
 							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					userMarker.setPosition(new LatLng (location.getLatitude(),location.getLongitude()));
 					mapClicked = false;
 				}
 			}
@@ -391,6 +405,16 @@ public class MainActivity extends AppCompatActivity
 			public void onMapClick(LatLng latLng) {
 				Log.i("MAP", latLng.toString());
 				nanotamMarker.showInfoWindow();
+				//FOR TEST
+				test = latLng;
+				keyf = serverUtil.park(test);
+				if ( keyf == null ) {
+					Toast.makeText( MainActivity.this, "batırdın", Toast.LENGTH_SHORT).show();
+				}
+				else {
+					parked(keyf);
+				}
+				//FOR TEST
 				mapClicked = true;
 			}
 		});
@@ -409,7 +433,7 @@ public class MainActivity extends AppCompatActivity
 				Log.i("MARKER", "CLICKLENDI");
 				polygonClicked = true;
 				mapClicked = true;
-				if (marker.getTag().equals("nanotamMarker")) {
+				if ( marker.getTag().equals("nanotamMarker") ) {
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
 							.zoom(19)                  // Sets the zoom
@@ -436,7 +460,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 		/*
-		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+		ParkingRow "Row = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
 				new LatLng(39.867104, 32.747219)});
@@ -445,45 +469,73 @@ public class MainActivity extends AppCompatActivity
 			39.867003, 32.747375
 			39.867100, 32.747359
 		 */ // The following numbers ARE NOT CORRECT; for test only.
-		ParkingRow testRow = new ParkingRow(4, new LatLng[]{new LatLng(39.867069, 32.747314),
-				new LatLng(39.866980, 32.747340),
-				new LatLng(39.867003, 32.747375),
-				new LatLng(39.867100, 32.747359)});
-		Log.d("TEST", "TEST");
 
-		for (ParkingSpot ps : testRow.parkingSpots) {
+
+		mMap.addPolygon(new PolygonOptions()
+				.add(new LatLng(39.867142692959746,32.74706404656172),
+						new LatLng(39.86657861133413,32.74714753031731),
+						new LatLng(39.86654387075395,32.74722263216973),
+						new LatLng(39.867100232597345,32.74715155363083))
+				.strokeColor(Color.BLACK)
+				.fillColor(Color.GRAY)
+				.strokeWidth(10) );
+
+		 /**
+		Log.d("TEST","TEST");
+
+		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
-		}
-/*
+		} */
+		serverUtil = new ServerUtil();
+		slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
+		Log.d("TEST COUNTER", ""+ParkingSpot.counter);
+		/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
 			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
-*/
+		*/
+
+		for ( LatLng[] latLngs: ParkingSpot.polytest ) {
+			polyTest(latLngs[0], latLngs[1], latLngs[2], latLngs[3]);
+		}
+
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
 				.addChildEventListener(new ChildEventListener() {
 					@Override
 					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-						// repaint. getParkingSpots();
+						Toast.makeText(MainActivity.this,"DATA DEGISTI", Toast.LENGTH_SHORT);
+						for ( int i = 0; i < serverUtil.getParkingSpots().size(); i++ ) {
+							//IF SOMEBODY PARKS
+							if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
+									&& serverUtil.getParkingSpots().get(i).isParked() ) {
+
+								parked( serverUtil.getParkingSpots().get(i).getCenter() );
+							}
+							//IF SOMEBODY UNPARKS
+							else if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
+									&& !serverUtil.getParkingSpots().get(i).isParked() ) {
+
+								redDots.get( serverUtil.getParkingSpots().get(i).getCenter() ).remove();
+								redDots.remove( serverUtil.getParkingSpots().get(i).getCenter() );
+							}
+						}
+						slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
 					}
 
 					@Override
-					public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-					}
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
 
 					@Override
-					public void onChildRemoved(DataSnapshot dataSnapshot) {
-					}
+					public void onChildRemoved(DataSnapshot dataSnapshot) {}
 
 					@Override
-					public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-					}
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
 
 					@Override
-					public void onCancelled(DatabaseError databaseError) {
-					}
+					public void onCancelled(DatabaseError databaseError) {}
 				});
 
 		MapsInitializer.initialize(getApplicationContext());
