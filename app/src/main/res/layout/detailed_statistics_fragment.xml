@@ -61,27 +61,27 @@
     <LinearLayout
         android:id="@+id/group_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:layout_marginTop="10dp">
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/line_chart"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_height="400dp" />
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="GO TO THE LIST OF LOTS"
-            android:textSize="14dp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="20dp" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:text="GO TO THE LIST OF LOTS"
+        android:textSize="14dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
