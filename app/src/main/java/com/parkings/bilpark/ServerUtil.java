@@ -64,8 +64,9 @@ public class ServerUtil {
 	/**
 	 * Default constructor
 	 */
-	private ServerUtil() {
+	public ServerUtil() {
 		// The method "initLotsAndRows" is not yet called
+		slots = new CopyOnWriteArrayList<>();
 		occupancyData = new ConcurrentHashMap<>();
 		statisticsData = new ConcurrentHashMap<>();
 
@@ -73,15 +74,22 @@ public class ServerUtil {
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 		DatabaseReference rootReference = firebaseDatabase.getReference();
 
-		parkingLots.add(new ParkingLot(148, new LatLng[] {new LatLng(39.86643115675040, 32.74708114564418),
+		parkingLots.add(new ParkingLot(148, new LatLng[] {
+				new LatLng(39.86643115675040, 32.74708114564418),
 				new LatLng(39.86654052536382, 32.74778019636869),
 				new LatLng(39.86715298637697, 32.74763870984316),
 				new LatLng(39.86722426824893, 32.74693094193936)}, nanotamLotTag));
-		parkingRows.add(new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
-				new LatLng(39.866530, 32.747152),
-				new LatLng(39.866542, 32.747316),
-				new LatLng(39.867104, 32.747219)}));
-
+		parkingRows.add(new ParkingRow(18, new LatLng[] {
+				new LatLng(39.867142692959746,32.74706404656172),
+				new LatLng(39.86657861133413,32.74714753031731),
+				new LatLng(39.86654387075395,32.74722263216973),
+				new LatLng(39.867100232597345,32.74715155363083)}));
+/*
+		new LatLng(39.867153243712394,32.74705667048693),
+				new LatLng(39.86658787548587,32.74714518338442),
+				new LatLng(39.86654901750769,32.74721559137105),
+				new LatLng(39.86711001134978,32.747138142585754)}));
+*/
 		// Main children, from root
 		statisticsReference = rootReference.child(statisticsTag);
 		parkingDataReference = rootReference.child(parkingDataTag);
@@ -108,9 +116,9 @@ public class ServerUtil {
 				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
-						slots = new CopyOnWriteArrayList<>();
+
 						for (int i = 0; i > noOfSlots; i++)
-							slots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
+							slots.set(i, dataSnapshot.child(i + "").getValue(ParkingSpot.class));
 					}
 
 					@Override

@@ -49,7 +49,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This is the main "Park" activity; the starting point of our application.
@@ -82,6 +84,9 @@ public class MainActivity extends AppCompatActivity
 	boolean userParked = false;
 	LatLng test;
 	private ServerUtil serverUtil;
+	private CopyOnWriteArrayList<ParkingSpot> slotsClone;
+	private HashMap<LatLng, GroundOverlay> redDots = new HashMap<>();
+	LatLng keyf;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -218,8 +223,8 @@ public class MainActivity extends AppCompatActivity
 
 	private void parked( LatLng center ) {
 		LatLngBounds dotBounds = new LatLngBounds(
-				new LatLng(39.866421, 32.746917),       // South west corner
-				new LatLng(39.867235, 32.747752));      // North east corner
+				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
+				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
 
 		GroundOverlayOptions dot = new GroundOverlayOptions()
 				.image(BitmapDescriptorFactory.fromResource(R.raw.reddot))
@@ -227,6 +232,7 @@ public class MainActivity extends AppCompatActivity
 				.transparency(0f);
 
 		GroundOverlay dotOverlay = mMap.addGroundOverlay(dot);
+		redDots.put( center, dotOverlay);
 	}
 
 	/**
@@ -253,6 +259,14 @@ public class MainActivity extends AppCompatActivity
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 		}
 		mapClicked = false;
+	}
+
+	public void polyTest( LatLng one, LatLng two, LatLng three, LatLng four ) {
+		mMap.addPolygon(new PolygonOptions()
+				.add(one, two, three, four )
+				.strokeColor(Color.BLACK)
+				.fillColor(Color.GRAY)
+				.strokeWidth(10) );
 	}
 
 	public void addPolygon( String tag ) {
@@ -306,6 +320,7 @@ public class MainActivity extends AppCompatActivity
 				.transparency(0f);
 
 		GroundOverlay nanotamOverlay = mMap.addGroundOverlay(nanotam);
+
 
 		nanotamMarker = mMap.addMarker(
 				new MarkerOptions().position(
@@ -384,6 +399,16 @@ public class MainActivity extends AppCompatActivity
 			public void onMapClick(LatLng latLng) {
 				Log.i("MAP", latLng.toString());
 				nanotamMarker.showInfoWindow();
+				//FOR TEST
+				test = latLng;
+				keyf = serverUtil.park(test);
+				if ( keyf == null ) {
+					Toast.makeText( MainActivity.this, "batırdın", Toast.LENGTH_SHORT).show();
+				}
+				else {
+					parked(keyf);
+				}
+				//FOR TEST
 				mapClicked = true;
 			}
 		});
@@ -429,7 +454,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		}
 		/*
-		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+		ParkingRow "Row = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
 				new LatLng(39.867104, 32.747219)});
@@ -438,28 +463,60 @@ public class MainActivity extends AppCompatActivity
 			39.867003, 32.747375
 			39.867100, 32.747359
 		 */ // The following numbers ARE NOT CORRECT; for test only.
-		ParkingRow testRow = new ParkingRow(4, new LatLng[] {new LatLng(39.867069, 32.747314),
-				new LatLng(39.866980, 32.747340),
-				new LatLng(39.867003, 32.747375),
-				new LatLng(39.867100, 32.747359)});
+
+
+		mMap.addPolygon(new PolygonOptions()
+				.add(new LatLng(39.867142692959746,32.74706404656172),
+						new LatLng(39.86657861133413,32.74714753031731),
+						new LatLng(39.86654387075395,32.74722263216973),
+						new LatLng(39.867100232597345,32.74715155363083))
+				.strokeColor(Color.BLACK)
+				.fillColor(Color.GRAY)
+				.strokeWidth(10) );
+
+		 /**
 		Log.d("TEST","TEST");
 
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
-		}
-/*
+		} */
+		serverUtil = new ServerUtil();
+		slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
+		Log.d("TEST COUNTER", ""+ParkingSpot.counter);
+		/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
 			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
-*/
+		*/
+
+		for ( LatLng[] latLngs: ParkingSpot.polytest ) {
+			polyTest(latLngs[0], latLngs[1], latLngs[2], latLngs[3]);
+		}
+
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
 				.addChildEventListener(new ChildEventListener() {
 					@Override
 					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-						// repaint. getParkingSpots();
+						Toast.makeText(MainActivity.this,"DATA DEGISTI", Toast.LENGTH_SHORT);
+						for ( int i = 0; i < serverUtil.getParkingSpots().size(); i++ ) {
+							//IF SOMEBODY PARKS
+							if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
+									&& serverUtil.getParkingSpots().get(i).isParked() ) {
+
+								parked( serverUtil.getParkingSpots().get(i).getCenter() );
+							}
+							//IF SOMEBODY UNPARKS
+							else if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
+									&& !serverUtil.getParkingSpots().get(i).isParked() ) {
+
+								redDots.get( serverUtil.getParkingSpots().get(i).getCenter() ).remove();
+								redDots.remove( serverUtil.getParkingSpots().get(i).getCenter() );
+							}
+						}
+						slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
 					}
 
 					@Override
