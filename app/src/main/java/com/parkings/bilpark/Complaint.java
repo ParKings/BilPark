@@ -5,6 +5,8 @@ package com.parkings.bilpark;
  *
  * @author Emre Acarturk
  * @version 2018.04.28.0 : Added getters and JavaDoc
+ *
+ * @deprecated Functionality transferred to AppComplaintsFragment and UserComplaintsFragment.
  */
 public class Complaint {
 	private String complaintBody;
@@ -13,7 +15,8 @@ public class Complaint {
 	/**
 	 * Default constructor needed for Firebase integration
 	 */
-	public Complaint() {}
+	public Complaint() {
+	}
 
 	/**
 	 * Secondary constructor initializing parameters.

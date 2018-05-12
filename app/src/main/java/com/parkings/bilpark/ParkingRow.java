@@ -23,6 +23,7 @@ public class ParkingRow {
 	double long32difference;
 
 	//constructor
+
 	/**
 	 * The constructor which constructs parking spots within a given parking row
 	 *
