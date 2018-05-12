@@ -22,11 +22,24 @@ public class ActionButtonFragment extends Fragment {
 	//properties
 	private MainActivity activity;
 
+	/*
+	 * Initializes ActionButtonFragment via particular parameters
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.action_button, null);
 	}
 
+	/*
+	 * Defines particular views in this fragment
+	 *
+	 * @param view
+	 * @param savedInstanceState
+	 */
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

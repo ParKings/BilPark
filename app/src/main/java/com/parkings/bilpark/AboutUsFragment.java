@@ -9,14 +9,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
+ * A class that helps to express our thoughts and intents
+ * related to this project
+ *
  * Created by uğur on 27.03.2018. Opens up the related XML file.
+ * Modified by furkan on 12.05.2018
  *
  * @author Ugur
  * @version 2018.05.11.0
  */
 public class AboutUsFragment extends Fragment {
 
-	/* __________STUB__________ */
+	/*
+	 * Initializes aboutUsFragment via particular parameters
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

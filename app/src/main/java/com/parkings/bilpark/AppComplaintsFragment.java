@@ -9,22 +9,45 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
+/*
+ * Opens up the app complaints XML file and oversees
+ * functionality of the related buttons and text fields.
+ *
+ * @author Furkan
+ * @version 2018.05.12.0
+ */
 public class AppComplaintsFragment extends Fragment {
 
+	//properties
 	private EditText editComplaint;
 	private ServerUtil serverUtil;
 
+	/**
+	 * A default constructor that helps to inirtialize this fragment
+	 */
 	public AppComplaintsFragment() {
 		serverUtil = ServerUtil.getInstance();
 	}
 
+	/*
+	 * Initializes AppComplaintsFragment via particular parameters
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.app_complaints_fragment, null);
 	}
 
+	/*
+	 * The items in this view are initialized via this method
+	 *
+	 * @param view
+	 * @param savedInstanceState
+	 */
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
