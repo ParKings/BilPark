@@ -34,6 +34,9 @@ public class ParkingSpot {
 	@Exclude
 	public static final String centerTag = "center";
 
+	@Exclude
+	private static final double EPSILON = 1e-7;
+
 	//properties
 	private boolean isParked;
 	private LatLng center;
