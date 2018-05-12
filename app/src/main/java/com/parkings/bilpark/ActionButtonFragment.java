@@ -8,6 +8,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
+/**
+ * Opens up and oversees the floating action buttons and their functionality.
+ * Extends Fragment, hence is bound to its related activity, i.e. MainActivity.
+ * <p>
+ * Last edited by Emre Acarturk. Added JavaDocs.
+ *
+ * @author Furkan
+ * @version 2018.05.11.0
+ */
 public class ActionButtonFragment extends Fragment {
 
 	//properties

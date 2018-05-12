@@ -6,7 +6,7 @@ import com.google.firebase.database.Exclude;
 /**
  * Created by uğur on 15.04.2018.
  * Last edited by Emre on 25.04.2018.
- *
+ * <p>
  * Last edited to add JavaDoc.
  *
  * @author Ugur
@@ -23,10 +23,12 @@ public class ParkingLot {
 	private String name;
 
 	//constructors
+
 	/**
 	 * Default constructor needed for Firebase integration
 	 */
-	public ParkingLot() {}
+	public ParkingLot() {
+	}
 
 	/**
 	 * Secondary constructor initializing parameters.
@@ -56,30 +58,31 @@ public class ParkingLot {
 
 	/**
 	 * Returns true if the given coordinates are within reasonable proximity of the given lot
+	 *
 	 * @param latLng The coordinate to be checked
 	 * @return true;  if the given coordinates are within reasonable proximity of the given lot
-	 *         false; otherwise
+	 * false; otherwise
 	 */
 	@Exclude
 	public boolean contains(LatLng latLng) {
 		double totalArea = 0.5 * Math.abs(
 				corners[0].latitude * corners[1].longitude +
-				corners[1].latitude * corners[2].longitude +
-				corners[2].latitude * corners[3].longitude +
-				corners[3].latitude * corners[0].longitude -
-				corners[1].latitude * corners[0].longitude -
-				corners[2].latitude * corners[1].longitude -
-				corners[3].latitude * corners[2].longitude -
-				corners[0].latitude * corners[3].longitude);
+						corners[1].latitude * corners[2].longitude +
+						corners[2].latitude * corners[3].longitude +
+						corners[3].latitude * corners[0].longitude -
+						corners[1].latitude * corners[0].longitude -
+						corners[2].latitude * corners[1].longitude -
+						corners[3].latitude * corners[2].longitude -
+						corners[0].latitude * corners[3].longitude);
 		double resultingArea = 0;
 		for (int i = 0; i < 4; i++) {
 			resultingArea += 0.5 * Math.abs(
 					latLng.latitude * corners[0 + i].longitude +
-					corners[0 + i].latitude * corners[(1 + i) % 4].longitude +
-					corners[(1 + i) % 4].latitude * latLng.longitude -
-					corners[0 + i].latitude * latLng.longitude -
-					corners[(1 + i) % 4].latitude * corners[0 + i].longitude -
-					latLng.latitude * corners[(1 + i) % 4].longitude);
+							corners[0 + i].latitude * corners[(1 + i) % 4].longitude +
+							corners[(1 + i) % 4].latitude * latLng.longitude -
+							corners[0 + i].latitude * latLng.longitude -
+							corners[(1 + i) % 4].latitude * corners[0 + i].longitude -
+							latLng.latitude * corners[(1 + i) % 4].longitude);
 		}
 		return resultingArea <= totalArea;
 	}
@@ -90,7 +93,7 @@ public class ParkingLot {
 	 * @return Is the lot empty
 	 */
 	@Exclude
-	public boolean isEmpty () {
+	public boolean isEmpty() {
 		return occupiedSlots <= 0;
 	}
 

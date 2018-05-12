@@ -17,7 +17,15 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 /**
- * Created by uğur on 27.03.2018.
+ * Created by uğur on 27.03.2018. Opens up the complaints XML file and oversees
+ * functionality of the related buttons and text fields.
+ * <p>
+ * Extends Fragment, hence is bound to its related activity, i.e. MainActivity.
+ * <p>
+ * Last edited by Emre Acarturk. Added JavaDocs.
+ *
+ * @author Ugur
+ * @version 2018.05.11.0
  */
 public class ComplaintsFragment extends Fragment {
 

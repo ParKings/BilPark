@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Created by uğur on 27.03.2018.
+ * Created by uğur on 27.03.2018. Opens up the related XML file.
+ *
+ * @author Ugur
+ * @version 2018.05.11.0
  */
-
 public class AboutUsFragment extends Fragment {
 
 	/* __________STUB__________ */

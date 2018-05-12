@@ -36,6 +36,11 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * create an instance of this fragment.
+ * <p>
+ * ToDo: Fill in the @author !!!
+ *
+ * @author
+ * @version 2018.05.11.0
  */
 public class DetailedStatisticsFragment extends Fragment {
 
@@ -184,8 +189,8 @@ public class DetailedStatisticsFragment extends Fragment {
 	}
 
 	public int getRoundedRatio(int index) {
-		int roundedRatio = (int)(getRatio(index) + 0.5);
-		if(roundedRatio > 100)
+		int roundedRatio = (int) (getRatio(index) + 0.5);
+		if (roundedRatio > 100)
 			roundedRatio = 100;
 
 		return roundedRatio;
@@ -217,7 +222,6 @@ public class DetailedStatisticsFragment extends Fragment {
 		// TODO: Update argument type and name
 		void onFragmentInteraction(Uri uri);
 	}*/
-
 	public void initialize(String lotName) {
 		lotStatistics = Statistics.getLotStatistics(lotName);
 		scheduleTypes = lotStatistics.getScheduleTypes();
