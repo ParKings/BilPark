@@ -137,6 +137,9 @@ public class MainActivity extends AppCompatActivity
 		} else if (fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
 			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 			navigationView.getMenu().getItem(0).setChecked(true);
+		} else if (fragment instanceof ComplaintsFragment || fragment instanceof AboutUsFragment) {
+			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
+			navigationView.getMenu().getItem(0).setChecked(true);
 		} else if (fragment == null) {
 			finish();
 		} else {
