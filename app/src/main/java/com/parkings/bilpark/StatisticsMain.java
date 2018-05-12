@@ -12,16 +12,15 @@ import android.view.ViewGroup;
  * StatisticsFragment class
  * which extends Fragment class to provide UI design
  * for the statistics option of the main menu
- *
+ * <p>
  * Created by uğur on 27.03.2018.
  * Modified by furkan on 05.05.2018
  *
  * @author furkan
  * @version 2018.05.05.0
  */
-
-// IN FRAGMENTS USE getActivity() METHOD INSTEAD OF getApplicationContext() THAT YOU WOULD NORMALLY USE
 public class StatisticsMain extends Fragment {
+// IN FRAGMENTS USE getActivity() METHOD INSTEAD OF getApplicationContext() THAT YOU WOULD NORMALLY USE
 
 	/**
 	 * Initializes a View related to this fragment
@@ -30,7 +29,6 @@ public class StatisticsMain extends Fragment {
 	 * @param group
 	 * @param savedInstanceState
 	 * @return View
-	 *
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle savedInstanceState) {

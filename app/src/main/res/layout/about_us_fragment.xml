@@ -1,21 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/place_autocomplete_search_text"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_height="50dp"
+            android:paddingTop="8dp"
+            android:src="@drawable/aboutus" />
+
+        <TextView
+            android:id="@+id/about_us"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="10dp"
+
+            android:gravity="left|center_vertical"
+            android:text="About Us"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="7dp"
+        android:background="@color/white"
+        android:orientation="horizontal">
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
+        android:layout_gravity="top|center"
         android:layout_marginTop="16dp"
-        android:text="We are a group of developers from Bilkent University \n Group Members are: \n Emre Acarturk \n Furkan Turgut \n Altan Akat \n Ugur Yilmaz \n Yaman Yucel \n \n We hope that you liked our first app \n \n Do not forget to give feedback from Complaints "
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textStyle="bold"
+        android:textSize="14dp"
+        android:textColor="@color/white"/>
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

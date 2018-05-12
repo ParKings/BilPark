@@ -42,13 +42,13 @@ public class ServerUtil {
 	private final DatabaseReference complaintsReference;
 	private final int noOfSlots;
 
-	private static final String statisticsTag  = "statistics";
+	private static final String statisticsTag = "statistics";
 	private static final String parkingDataTag = "parkingdata";
-	private static final String complaintsTag  = "complaints";
+	private static final String complaintsTag = "complaints";
 
 	public static final String nanotamLotTag = "Nanotam";
-	public static final String unamLotTag    = "Unam";
-	public static final String mescidLotTag  = "Mescid";
+	public static final String unamLotTag = "Unam";
+	public static final String mescidLotTag = "Mescid";
 
 	// Static checker
 	private static ServerUtil serverUtil;
@@ -61,6 +61,7 @@ public class ServerUtil {
 	private CopyOnWriteArrayList<ParkingSpot> slots;
 
 	// Constructor
+
 	/**
 	 * Default constructor
 	 */
@@ -73,11 +74,11 @@ public class ServerUtil {
 		FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 		DatabaseReference rootReference = firebaseDatabase.getReference();
 
-		parkingLots.add(new ParkingLot(148, new LatLng[] {new LatLng(39.86643115675040, 32.74708114564418),
+		parkingLots.add(new ParkingLot(148, new LatLng[]{new LatLng(39.86643115675040, 32.74708114564418),
 				new LatLng(39.86654052536382, 32.74778019636869),
 				new LatLng(39.86715298637697, 32.74763870984316),
 				new LatLng(39.86722426824893, 32.74693094193936)}, nanotamLotTag));
-		parkingRows.add(new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
+		parkingRows.add(new ParkingRow(36, new LatLng[]{new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
 				new LatLng(39.867104, 32.747219)}));
@@ -133,6 +134,7 @@ public class ServerUtil {
 	}
 
 	// Methods
+
 	/**
 	 * Parks the car and sends the parking data to the database. Includes the necessary algorithm
 	 * to park with a given latLng data. Updates the ParkingLot and ParkingSpace that has been
@@ -233,7 +235,9 @@ public class ServerUtil {
 	 *
 	 * @return all ParkingLots
 	 */
-	ParkingLot[] getParkingLots() { return (ParkingLot[]) parkingLots.toArray(); }
+	ParkingLot[] getParkingLots() {
+		return (ParkingLot[]) parkingLots.toArray();
+	}
 
 	/**
 	 * Sends the app-related complaint to the server.
@@ -282,11 +286,11 @@ public class ServerUtil {
 	 * Returns the concurrent occupancy data in a ConcurrentHashMap with given keys.
 	 *
 	 * @return new ConcurrentHashMap<String, Double> =
-	 *            {
-	 *               mescidLotTag  : double
-	 *               nanotamLotTag : double
-	 *               unamLotTag    : double
-	 *            }
+	 * {
+	 * mescidLotTag  : double
+	 * nanotamLotTag : double
+	 * unamLotTag    : double
+	 * }
 	 */
 	ConcurrentHashMap<String, Double> getOccupancy() {
 		statisticsReference.child("concurrent")
@@ -309,7 +313,8 @@ public class ServerUtil {
 	 *
 	 * @return The formatted string for current time
 	 */
-	@SuppressWarnings("unused") // Yeah, we know, thou hadn't used yet.
+	@SuppressWarnings("unused")
+	// Yeah, we know, thou hadn't used yet.
 	String getTime() {
 		return new SimpleDateFormat("yyyy-MM-dd--HH-mm-ss", Locale.ENGLISH)
 				.format(Calendar.getInstance().getTime());

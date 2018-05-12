@@ -3,9 +3,10 @@ package com.parkings.bilpark;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
+ * <p>
  * Created by uğur on 15.04.2018.
  * Last modified by Emre on 28.04.2018, added warning statement.
- *
+ * </p>
  * <p>
  * <b>Warning:</b> Lost functionality, a.k.a. not backwards compatible
  * </p>

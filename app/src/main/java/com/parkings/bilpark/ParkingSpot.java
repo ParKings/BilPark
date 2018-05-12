@@ -21,9 +21,9 @@ public class ParkingSpot {
 	//SIDE 01 AND 32 ARE SHORTER ONES
 	// Constants
 	@Exclude
-	public static final String isParkedTag   = "isParked";
+	public static final String isParkedTag = "isParked";
 	@Exclude
-	public static final String centerTag     = "center";
+	public static final String centerTag = "center";
 
 	//properties
 	private boolean isParked;
@@ -35,10 +35,12 @@ public class ParkingSpot {
 	static int counter = 0;
 
 	//constructors
+
 	/**
 	 * Default constructor needed for Firebase integration
 	 */
-	public ParkingSpot() {}
+	public ParkingSpot() {
+	}
 
 	/**
 	 * Secondary constructor initializing parameters.
@@ -59,6 +61,7 @@ public class ParkingSpot {
 						+ (Math.abs(corners[0].longitude - corners[3].longitude) / 3)) / 2);
 		isParked = false;
 		LatLngBounds dotBounds = new LatLngBounds(
+
 				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
 				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
     //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
@@ -82,7 +85,7 @@ public class ParkingSpot {
 	/**
 	 * Sets the spot's status to unoccupied by storing the "minimum string" as date
 	 */
-	public void unpark () {
+	public void unpark() {
 		isParked = false;
 	}
 
@@ -115,7 +118,7 @@ public class ParkingSpot {
 	}
 
 	public String toString() {
-		return ( "\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + isParked );
+		return ("\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + isParked);
 	}
 
 	/**
@@ -123,7 +126,7 @@ public class ParkingSpot {
 	 *
 	 * @param latLng The coordinate to be checked
 	 * @return true; if the given point is effectively within the spot's reach
-	 *         false; else
+	 * false; else
 	 */
 	@Exclude
 	public boolean contains(LatLng latLng) {

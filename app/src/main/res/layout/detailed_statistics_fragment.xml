@@ -61,40 +61,27 @@
     <LinearLayout
         android:id="@+id/group_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:layout_marginTop="10dp">
 
-        <LinearLayout
-            android:id="@+id/graph"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/line_chart"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:layout_weight="7"
-            android:background="@color/blue"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp" />
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="16dp"
-                android:text="Still working on this page. Sorry about that :(" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="GO TO THE LIST OF LOTS"
-            android:textSize="14dp"
-            android:textStyle="bold" />
     </LinearLayout>
 
-
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:text="GO TO THE LIST OF LOTS"
+        android:textSize="14dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
