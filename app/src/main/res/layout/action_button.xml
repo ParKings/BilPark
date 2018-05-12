@@ -7,6 +7,16 @@
     android:gravity="end|bottom">
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_margin="16dp"
+        android:src="@drawable/baseline_local_parking_black_18dp"
+        android:tint="#a80000"
+        app:backgroundTint="@color/common_google_signin_btn_text_dark_pressed" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,5 +24,6 @@
         android:src="@drawable/ic_gps_fixed_black_24dp"
         android:tint="@color/colorPrimaryDark"
         app:backgroundTint="@color/common_google_signin_btn_text_dark_pressed" />
+
 
 </LinearLayout>

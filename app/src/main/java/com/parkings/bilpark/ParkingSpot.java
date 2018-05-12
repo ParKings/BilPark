@@ -30,7 +30,9 @@ public class ParkingSpot {
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
-	static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
+	public static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
+  //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
+	static int counter = 0;
 
 	//constructors
 
@@ -46,6 +48,7 @@ public class ParkingSpot {
 	 * @param corners The corners of this parking spot
 	 */
 	public ParkingSpot(LatLng[] corners) {
+		counter++;
 		this.corners = corners;
 		center = new LatLng(
 				(corners[2].latitude
@@ -58,12 +61,16 @@ public class ParkingSpot {
 						+ (Math.abs(corners[0].longitude - corners[3].longitude) / 3)) / 2);
 		isParked = false;
 		LatLngBounds dotBounds = new LatLngBounds(
-				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012),       // South west corner
-				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012));      // North east corner
-		dots.put(center, new GroundOverlayOptions()
-				.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))
-				.positionFromBounds(dotBounds)
-				.transparency(0f));
+
+				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
+				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
+    //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
+		if ( counter < 36 && counter > 31 ) {
+			dots.put(center, new GroundOverlayOptions()
+					.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))
+					.positionFromBounds(dotBounds)
+					.transparency(0f));
+		}
 	}
 
 	//methods
