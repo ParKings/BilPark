@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity
 	private CopyOnWriteArrayList<ParkingSpot> slotsClone;
 	private HashMap<LatLng, GroundOverlay> redDots = new HashMap<>();
 	LatLng keyf;
+	private BitmapDrawable bitmapdraw2;
+	private Bitmap b2;
+	private Bitmap smallMarker2;
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -345,6 +348,7 @@ public class MainActivity extends AppCompatActivity
 				if (polygon.getTag().equals("nanotam")) {
 					Log.i("POLYGON CLICKLENDI", "IF'IN ICI");
 					nanotamPolygon.remove();
+					nanotamMarker.hideInfoWindow();
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
 							.zoom(19)                  // Sets the zoom
@@ -358,6 +362,12 @@ public class MainActivity extends AppCompatActivity
 
 		//GETTING USERS LOCATION
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		/*
+		int height = 300;
+		int width = 300;
+		bitmapdraw2 = (BitmapDrawable)getResources().getDrawable(R.drawable.baseline_navigation_black_48dp);
+		b2 = bitmapdraw2.getBitmap();
+		smallMarker2  = Bitmap.createScaledBitmap(b, width, height, false); */
 
 		//mMap.getUiSettings().setZoomGesturesEnabled(false);
 		//LatLng turkey = new LatLng(39.868435, 32.748919);
@@ -379,6 +389,7 @@ public class MainActivity extends AppCompatActivity
 							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					userMarker.remove();
 					userMarker.setPosition(new LatLng (location.getLatitude(),location.getLongitude()));
 					mapClicked = false;
 				}
@@ -404,7 +415,6 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onMapClick(LatLng latLng) {
 				Log.i("MAP", latLng.toString());
-				nanotamMarker.showInfoWindow();
 				//FOR TEST
 				test = latLng;
 				keyf = serverUtil.park(test);
@@ -441,6 +451,7 @@ public class MainActivity extends AppCompatActivity
 							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					nanotamMarker.hideInfoWindow();
 					nanotamPolygon.remove();
 				}
 				return true;
