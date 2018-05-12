@@ -3,6 +3,7 @@ package com.parkings.bilpark;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,7 +57,7 @@ public class ServerUtil {
 	// Properties
 	private ArrayList<ParkingLot> parkingLots = new ArrayList<ParkingLot>();
 	private ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
-	private ConcurrentHashMap<String, Double> occupancyData;
+	private ConcurrentHashMap<String, Integer> occupancyData;
 	private ConcurrentHashMap<String, Double> statisticsData;
 	private CopyOnWriteArrayList<ParkingSpot> slots;
 
@@ -113,12 +114,26 @@ public class ServerUtil {
 		// Parked slot data retrieval listener.
 		parkingDataReference.child("slots")
 				.orderByChild(ParkingSpot.isParkedTag)
-				.addValueEventListener(new ValueEventListener() {
+				.addChildEventListener(new ChildEventListener() {
 					@Override
-					public void onDataChange(DataSnapshot dataSnapshot) {
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+					}
 
-						for (int i = 0; i > noOfSlots; i++)
-							slots.set(i, dataSnapshot.child(i + "").getValue(ParkingSpot.class));
+					@Override
+					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+						if (slots.size() == 0)
+							for (int i = 0; i < noOfSlots; i++)
+								slots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
+						else
+							slots.set(Integer.parseInt(s), dataSnapshot.child(s).getValue(ParkingSpot.class));
+					}
+
+					@Override
+					public void onChildRemoved(DataSnapshot dataSnapshot) {
+					}
+
+					@Override
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 					}
 
 					@Override
@@ -296,9 +311,9 @@ public class ServerUtil {
 	 *               unamLotTag    : double
 	 *            }
 	 */
-	ConcurrentHashMap<String, Double> getOccupancy() {
-		statisticsReference.child("concurrent")
-				.addListenerForSingleValueEvent(new ValueEventListener() {
+	ConcurrentHashMap<String, Integer> getOccupancy() {
+		statisticsReference.child("parkingdata/lots")
+				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
 						occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);

@@ -30,12 +30,16 @@ public class ParkingSpot {
 
 	//properties
 	private boolean isParked;
+	@Exclude
 	private LatLng center;
 	@Exclude
 	private LatLng[] corners;
+	@Exclude
 	public static HashMap<LatLng, GroundOverlayOptions> dots = new HashMap<>();
   //COUNTER IS FOR CONTROLLING THE NUMBER OF GREEN DOTS
-	static int counter = 0;
+    @Exclude
+    static int counter = 0;
+	@Exclude
 	static LatLng[][] polytest = new LatLng[17][4];
 
 	//constructors
@@ -81,6 +85,7 @@ public class ParkingSpot {
 	/**
 	 * Sets the spot's status to occupied by storing the parking date
 	 */
+	@Exclude
 	public void park() {
 		isParked = true;
 	}
@@ -88,6 +93,7 @@ public class ParkingSpot {
 	/**
 	 * Sets the spot's status to unoccupied by storing the "minimum string" as date
 	 */
+	@Exclude
 	public void unpark() {
 		isParked = false;
 	}
@@ -116,10 +122,12 @@ public class ParkingSpot {
 	 *
 	 * @return Coordinates of this parking spot's center
 	 */
+	@Exclude
 	public LatLng getCenter() {
 		return center;
 	}
 
+	@Exclude
 	public String toString() {
 		return ("\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + isParked);
 	}
