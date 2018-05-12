@@ -58,10 +58,10 @@ public class ParkingSpot {
 		LatLngBounds dotBounds = new LatLngBounds(
 				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
 				new LatLng(center.latitude + 0.000012, center.longitude + 0.000012 ));      // North east corner
-		dots.put(center, new GroundOverlayOptions()
+		/*dots.put(center, new GroundOverlayOptions()
 				.image(BitmapDescriptorFactory.fromResource(R.raw.greendot))
 				.positionFromBounds(dotBounds)
-				.transparency(0f));
+				.transparency(0f));*/
 	}
 
 	//methods

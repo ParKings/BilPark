@@ -39,32 +39,8 @@ import java.util.ArrayList;
  */
 public class DetailedStatisticsFragment extends Fragment {
 
-	private class EnhancedArrayAdapter extends ArrayAdapter<String> {
-
-		public EnhancedArrayAdapter(Context context, int resourceId, String[] list) {
-			super(context, resourceId, list);
-		}
-
-		@Override
-		public View getDropDownView(int index, View view, ViewGroup container) {
-			return getCustomView(index);
-		}
-
-		@Override
-		public View getView(int index, View view, ViewGroup container) {
-			return getCustomView(index);
-		}
-
-		public View getCustomView(int index) {
-			View view = getLayoutInflater().inflate(R.layout.custom_line, null);
-			TextView text = view.findViewById(R.id.anOption);
-			text.setText(getItem(index));
-
-			return view;
-		}
-	}
-
 	//properties
+	private LayoutInflater inflater;
 	private LotStatistics lotStatistics;
 	private String[] scheduleTypes;
 	private ArrayAdapter<String> adapter;
@@ -80,14 +56,12 @@ public class DetailedStatisticsFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-
-
-
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
+		this.inflater = inflater;
 		return inflater.inflate(R.layout.detailed_statistics_fragment, null);
 	}
 
@@ -189,7 +163,7 @@ public class DetailedStatisticsFragment extends Fragment {
 		});
 
 		spinner = view.findViewById(R.id.spinner);
-		adapter = new EnhancedArrayAdapter(getActivity(), R.layout.custom_line, scheduleTypes);
+		adapter = new EnhancedArrayAdapter(getActivity(), R.layout.custom_line, scheduleTypes, inflater);
 		spinner.setAdapter(adapter);
 
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
