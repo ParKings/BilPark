@@ -1,29 +1,22 @@
 package com.parkings.bilpark;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -33,13 +26,10 @@ import java.util.ArrayList;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * create an instance of this fragment.
- * <p>
- * ToDo: Fill in the @author !!!
+ * A fragment which displays statistics of parking lots
+ * in terms of day, week and month
  *
- * @author
+ * @author furkan & altan
  * @version 2018.05.11.0
  */
 public class DetailedStatisticsFragment extends Fragment {
@@ -52,17 +42,29 @@ public class DetailedStatisticsFragment extends Fragment {
 	private Spinner spinner;
 	private String currentLot;
 	private TextView lotInfo;
-	private int percentage;
+	//private int percentage;
 	private Button backButton;
 	private Fragment fragment;
 	private LineChart lineChart;
+	private ArrayList<ILineDataSet> lineDataSets;
+	private LineDataSet lineDataSet1_1;
+	private LineDataSet lineDataSet1_2;
+	private LineDataSet lineDataSet1_3;
+	private LineDataSet lineDataSet2_1;
+	private LineDataSet lineDataSet2_2;
+	private LineDataSet lineDataSet2_3;
+	private LineDataSet lineDataSet3_1;
+	private LineDataSet lineDataSet3_2;
+	private LineDataSet lineDataSet3_3;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-	}
-
+	//methods
+	/**
+	 * Initializes the view related to this fragment
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
@@ -70,27 +72,6 @@ public class DetailedStatisticsFragment extends Fragment {
 		return inflater.inflate(R.layout.detailed_statistics_fragment, null);
 	}
 
-	// TODO: Rename method, update argument and hook method into UI event
-	/*public void onButtonPressed(Uri uri) {
-		if (mListener != null) {
-			mListener.onFragmentInteraction(uri);
-		}
-	}
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		if (context instanceof OnFragmentInteractionListener) {
-			mListener = (OnFragmentInteractionListener) context;
-		} else {
-			throw new RuntimeException(context.toString()
-					+ " must implement OnFragmentInteractionListener");
-		}
-	}
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mListener = null;
-	}
 	  /**
      * Initializes and displays the list of
      * the parking lots after the view is created.
@@ -107,53 +88,79 @@ public class DetailedStatisticsFragment extends Fragment {
 		lotInfo = view.findViewById(R.id.lotname_info);
 		backButton = view.findViewById(R.id.back_button);
 
-		lineChart = (LineChart) view.findViewById(R.id.line_chart);
-
-		ArrayList<String> xAxes = new ArrayList<>();
-		ArrayList<Entry> yAxesNano = new ArrayList<>();
-		ArrayList<Entry> yAxesUnam = new ArrayList<>();
-		ArrayList<Entry> yAxesMescid = new ArrayList<>();
-
-		int x = 0;
-		int numDataPoints = 10;
-		for(int i = 1; i <= numDataPoints; i++)
-		{
-			float nanoFunction = Float.parseFloat(String.valueOf(Math.sqrt(x)));
-			float unamFunction = Float.parseFloat(String.valueOf(Math.pow(x, 3)));
-			float mescidFunction = Float.parseFloat(String.valueOf(Math.pow(x,5)));
-			x += 1;
-			yAxesNano.add(new Entry(nanoFunction,i));
-			yAxesUnam.add(new Entry(unamFunction,i));
-			yAxesMescid.add(new Entry(mescidFunction,i));
-			xAxes.add(String.valueOf(x));
-		}
-		String[] xaxes = new String[xAxes.size()];
-		for (int i = 0; i < xAxes.size(); i++)
-		{
-			xaxes[i] = xAxes.get(i).toString();
-		}
-		ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
-
-		LineDataSet lineDataSet1 = new LineDataSet(yAxesNano, "Nano Park");
-		lineDataSet1.setDrawCircles(false);
-		lineDataSet1.setColor(Color.BLUE);
-
-		LineDataSet lineDataSet2 = new LineDataSet(yAxesUnam, "Unam Park");
-		lineDataSet1.setDrawCircles(false);
-		lineDataSet2.setColor(Color.RED);
-
-		LineDataSet lineDataSet3 = new LineDataSet(yAxesMescid, "Mescid Park");
-		lineDataSet1.setDrawCircles(false);
-		lineDataSet3.setColor(Color.YELLOW);
-		lineDataSets.add(lineDataSet1);
-		lineDataSets.add(lineDataSet2);
-		lineDataSets.add(lineDataSet3);
-
-		lineChart.setData(new LineData(lineDataSets));
+		lineChart = view.findViewById(R.id.line_chart);
 		lineChart.setVisibleXRangeMaximum(10f);
-
 		lineChart.setBackgroundColor(Color.WHITE);
 
+		ArrayList<Entry> yAxesNanoDaily = new ArrayList<>();
+		ArrayList<Entry> yAxesNanoWeekly = new ArrayList<>();
+		ArrayList<Entry> yAxesNanoMonthly = new ArrayList<>();
+		ArrayList<Entry> yAxesUnamDaily = new ArrayList<>();
+		ArrayList<Entry> yAxesUnamWeekly = new ArrayList<>();
+		ArrayList<Entry> yAxesUnamMonthly = new ArrayList<>();
+		ArrayList<Entry> yAxesMescidDaily = new ArrayList<>();
+		ArrayList<Entry> yAxesMescidWeekly = new ArrayList<>();
+		ArrayList<Entry> yAxesMescidMonthly = new ArrayList<>();
+
+		int numDataPoints = 7;
+		for(int i = 1; i <= numDataPoints; i++)
+		{
+			float nanoDaily = Float.parseFloat(String.valueOf(Math.pow(i - 1, 5) % 100));
+			float unamDaily = Float.parseFloat(String.valueOf(Math.pow(i - 1, 4) % 100));
+			float mescidDaily = Float.parseFloat(String.valueOf(Math.pow(i - 1, 6) % 100));
+			yAxesNanoDaily.add(new Entry(i, nanoDaily));
+			yAxesUnamDaily.add(new Entry(i, unamDaily));
+			yAxesMescidDaily.add(new Entry(i, mescidDaily));
+		}
+
+		numDataPoints = 4;
+		for(int i = 1; i <= numDataPoints; i++)
+		{
+			float nanoWeekly = Float.parseFloat(String.valueOf(Math.pow(i - 1, 3) % 100));
+			float unamWeekly = Float.parseFloat(String.valueOf(Math.pow(i - 1, 2) % 100));
+			float mescidWeekly = Float.parseFloat(String.valueOf(Math.pow(i - 1, 4) % 100));
+			yAxesNanoWeekly.add(new Entry(i, nanoWeekly));
+			yAxesUnamWeekly.add(new Entry(i, unamWeekly));
+			yAxesMescidWeekly.add(new Entry(i, mescidWeekly));
+		}
+
+		numDataPoints = 12;
+		for(int i = 1; i <= numDataPoints; i++)
+		{
+			float nanoMonthy = Float.parseFloat(String.valueOf(Math.sqrt(i - 1) % 100));
+			float unamMonthy = Float.parseFloat(String.valueOf(Math.pow(i - 1, 0.33) % 100));
+			float mescidMonthy = Float.parseFloat(String.valueOf(Math.pow(i - 1, 2) % 100));;
+			yAxesNanoMonthly.add(new Entry(i, nanoMonthy));
+			yAxesUnamMonthly.add(new Entry(i, unamMonthy));
+			yAxesMescidMonthly.add(new Entry(i, mescidMonthy));
+		}
+
+		lineDataSet1_1 = new LineDataSet(yAxesNanoDaily, "Nanotam Park");
+		lineDataSet1_1.setColor(Color.BLUE);
+
+		lineDataSet1_2 = new LineDataSet(yAxesNanoWeekly, "Nanotam Park");
+		lineDataSet1_2.setColor(Color.BLUE);
+
+		lineDataSet1_3 = new LineDataSet(yAxesNanoMonthly, "Nanotam Park");
+		lineDataSet1_3.setColor(Color.BLUE);
+
+		lineDataSet2_1 = new LineDataSet(yAxesUnamDaily, "Unam Park");
+		lineDataSet2_1.setColor(Color.RED);
+
+		lineDataSet2_2 = new LineDataSet(yAxesUnamWeekly, "Unam Park");
+		lineDataSet2_2.setColor(Color.RED);
+
+		lineDataSet2_3 = new LineDataSet(yAxesUnamMonthly, "Unam Park");
+		lineDataSet2_3.setColor(Color.RED);
+
+		lineDataSet3_1 = new LineDataSet(yAxesMescidDaily, "Mescid Park");
+		lineDataSet3_1.setColor(Color.GREEN);
+
+		lineDataSet3_2 = new LineDataSet(yAxesMescidWeekly, "Mescid Park");
+		lineDataSet3_2.setColor(Color.GREEN);
+
+		lineDataSet3_3 = new LineDataSet(yAxesMescidMonthly, "Mescid Park");
+		lineDataSet3_3.setColor(Color.GREEN);
 
 		backButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -177,6 +184,7 @@ public class DetailedStatisticsFragment extends Fragment {
 												int index, long id) {
 
 				lotInfo.setText(scheduleTypes[index] + " Statistics For " + currentLot);
+				getRoundedRatio(index);
 
 				//percentage = getRoundedRatio(index);
 			}
@@ -188,16 +196,49 @@ public class DetailedStatisticsFragment extends Fragment {
 		});
 	}
 
-	public int getRoundedRatio(int index) {
-		int roundedRatio = (int) (getRatio(index) + 0.5);
+	/**
+	 * Rounds the numerical values obtained from getRatio() method
+	 *
+	 * @param index
+	 */
+	public void getRoundedRatio(int index) {
+		/*int roundedRatio = (int) (getRatio(index) + 0.5);
 		if (roundedRatio > 100)
 			roundedRatio = 100;
 
-		return roundedRatio;
+		return roundedRatio;*/
+		lineDataSets = new ArrayList<>();
+		if (index == 0 && currentLot.equals("Nanotam")) {
+			lineDataSets.add(lineDataSet1_1);
+		} else if (index == 1 && currentLot.equals("Nanotam")) {
+			lineDataSets.add(lineDataSet1_2);
+		} else if (index == 2 && currentLot.equals("Nanotam")) {
+			lineDataSets.add(lineDataSet1_3);
+		} else if (index == 0 && currentLot.equals("Unam")) {
+			lineDataSets.add(lineDataSet2_1);
+		} else if (index == 1 && currentLot.equals("Unam")) {
+			lineDataSets.add(lineDataSet2_2);
+		} else if (index == 2 && currentLot.equals("Unam")) {
+			lineDataSets.add(lineDataSet2_3);
+		} else if (index == 0 && currentLot.equals("Mescid")) {
+			lineDataSets.add(lineDataSet3_1);
+		} else if (index == 1 && currentLot.equals("Mescid")) {
+			lineDataSets.add(lineDataSet3_2);
+		} else if (index == 2 && currentLot.equals("Mescid")) {
+			lineDataSets.add(lineDataSet3_3);
+		}
+		lineChart.setData(new LineData(lineDataSets));
 	}
 
+	/**
+	 * Get particular ratios from LotStatistics class
+	 *
+	 * @param index
+	 * @return ratio
+	 */
 	public double getRatio(int index) {
 		double ratio = 0;
+
 		if (index == 0)
 			ratio = 100 * lotStatistics.getDaily().get(currentLot);
 		else if (index == 1)
@@ -209,19 +250,10 @@ public class DetailedStatisticsFragment extends Fragment {
 	}
 
 	/**
-	 * This interface must be implemented by activities that contain this
-	 * fragment to allow an interaction in this fragment to be communicated
-	 * to the activity and potentially other fragments contained in that
-	 * activity.
-	 * <p>
-	 * See the Android Training lesson <a href=
-	 * "http://developer.android.com/training/basics/fragments/communicating.html"
-	 * >Communicating with Other Fragments</a> for more information.
+	 * An initializer for this fragment
+	 *
+	 * @param lotName
 	 */
-	/*public interface OnFragmentInteractionListener {
-		// TODO: Update argument type and name
-		void onFragmentInteraction(Uri uri);
-	}*/
 	public void initialize(String lotName) {
 		lotStatistics = Statistics.getLotStatistics(lotName);
 		scheduleTypes = lotStatistics.getScheduleTypes();
