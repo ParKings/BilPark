@@ -34,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.GroundOverlay;
@@ -78,10 +79,11 @@ public class MainActivity extends AppCompatActivity
 	boolean polygonClicked;
 	private Fragment fragment, actionButton;
 	private NavigationView navigationView;
-	Polygon nanotamPolygon;
-	Marker nanotamMarker;
+	private Polygon nanotamPolygon;
+	private Marker nanotamMarker;
 	Location parkLocation;
 	boolean userParked = false;
+	private Marker userMarker;
 	LatLng test;
 	private ServerUtil serverUtil;
 	private CopyOnWriteArrayList<ParkingSpot> slotsClone;
@@ -257,6 +259,9 @@ public class MainActivity extends AppCompatActivity
 					//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 					.build();                  // Creates a CameraPosition from the builder
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+			userMarker = mMap.addMarker(new MarkerOptions().
+					position(userLocation).
+					icon(BitmapDescriptorFactory.fromResource(R.drawable.baseline_navigation_black_48dp)));
 		}
 		mapClicked = false;
 	}
@@ -366,7 +371,7 @@ public class MainActivity extends AppCompatActivity
 					Log.i("TAYF", ".");
 					//mMap.clear();
 					userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-					//mMap.addMarker(new MarkerOptions().position(userLocation).title("Marker in Turkey"));
+
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(userLocation)      // Sets the center of the map to Mountain View
 							.zoom(16)                  // Sets the zoom
@@ -374,6 +379,7 @@ public class MainActivity extends AppCompatActivity
 							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					userMarker.setPosition(new LatLng (location.getLatitude(),location.getLongitude()));
 					mapClicked = false;
 				}
 			}
