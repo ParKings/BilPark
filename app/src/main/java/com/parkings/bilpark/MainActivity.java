@@ -12,14 +12,13 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,6 +31,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity
 	boolean mapClicked;
 	boolean cameraClicked;
 	boolean polygonClicked;
-	private Fragment fragment;
+	private Fragment fragment, actionButton;
+	private NavigationView navigationView;
 	Polygon nanotamPolygon;
 	Marker nanotamMarker;
 	Location parkLocation;
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity
 		setContentView(R.layout.activity_main);
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
+		actionButton = new ActionButtonFragment();
 
 		DrawerLayout drawer = findViewById(R.id.drawer_layout);
 		ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -110,15 +112,13 @@ public class MainActivity extends AppCompatActivity
 		drawer.addDrawerListener(toggle);
 		toggle.syncState();
 
-		NavigationView navigationView = findViewById(R.id.nav_view);
+		navigationView = findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
 		supportMapFragment.getMapAsync(this);
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
-
-		serverUtil = ServerUtil.getInstance();
 	}
 
 	@Override
@@ -131,6 +131,9 @@ public class MainActivity extends AppCompatActivity
 			addPolygon("nanotam");
 			polygonClicked = false;
 		} else if(fragment instanceof StatisticsMain && fragment.getActivity().getSupportFragmentManager().findFragmentById(R.id.statistics) instanceof StatisticsFragment) {
+			onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
+			navigationView.getMenu().getItem(0).setChecked(true);
+		} else if (fragment == null) {
 			finish();
 		} else {
 			super.onBackPressed();
@@ -165,10 +168,12 @@ public class MainActivity extends AppCompatActivity
 		// Handle navigation view item clicks here.
 		fragment = null;
 		int id = item.getItemId();
-		android.support.v4.app.FragmentManager supportFragmentManager = getSupportFragmentManager();
+		FragmentManager supportFragmentManager = getSupportFragmentManager();
 		if (supportMapFragment.isAdded()) {
 			supportFragmentManager.beginTransaction().hide(supportMapFragment).commit();
 		}
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction;
 		if (id == R.id.nav_park) {
 			// handle the park fragment
 			if (!supportMapFragment.isAdded()) {
@@ -176,18 +181,26 @@ public class MainActivity extends AppCompatActivity
 			} else {
 				supportFragmentManager.beginTransaction().show(supportMapFragment).commit();
 			}
-		} else if (id == R.id.nav_statistics) {
-			fragment = new StatisticsMain();
-		} else if (id == R.id.nav_complaints) {
-			fragment = new ComplaintsFragment();
-		} else if (id == R.id.nav_aboutus) {
-			fragment = new AboutUsFragment();
-		}
-
-		if (fragment != null) {
-			android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
+			if (fragment != null) {
+				fragmentTransaction = fragmentManager.beginTransaction();
+				fragmentTransaction.remove(fragment);
+				fragmentTransaction.commit();
+			}
+			fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.replace(R.id.floating_action_button, actionButton);
+			fragmentTransaction.commit();
+		} else {
+			if (id == R.id.nav_statistics) {
+				fragment = new StatisticsMain();
+			} else if (id == R.id.nav_complaints) {
+				fragment = new ComplaintsFragment();
+			} else if (id == R.id.nav_aboutus) {
+				fragment = new AboutUsFragment();
+			}
+			fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.remove(actionButton);
+			fragmentTransaction.commit();
+			fragmentTransaction = fragmentManager.beginTransaction();
 			fragmentTransaction.replace(R.id.map, fragment);
 			fragmentTransaction.commit();
 		}
@@ -323,44 +336,6 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				getUserLocation();
-				polygonClicked = false;
-				addPolygon("nanotam" );
-			}
-		});
-
-		FloatingActionButton fab2 = findViewById(R.id.fab2);
-		fab2.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (ContextCompat.checkSelfPermission( MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
-
-					ActivityCompat.requestPermissions( MainActivity.this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-							1 );
-				}
-				parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-				if (parkLocation != null && !userParked) {
-					userParked = true;
-					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
-				}
-				//CHECK HERE
-				else if (parkLocation == null && !userParked) {
-					while ( parkLocation == null ) {
-						parkLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-					}
-					userParked = true;
-					test = serverUtil.park( new LatLng( parkLocation.getLatitude(), parkLocation.getLongitude() ) );
-				}
-				else {
-					Toast.makeText(MainActivity.this, "You are already parked", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-
 		//GETTING USERS LOCATION
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -453,23 +428,32 @@ public class MainActivity extends AppCompatActivity
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 			}
 		}
-
+		/*
 		ParkingRow testRow = new ParkingRow(36, new LatLng[] {new LatLng(39.867141, 32.747056),
 				new LatLng(39.866530, 32.747152),
 				new LatLng(39.866542, 32.747316),
 				new LatLng(39.867104, 32.747219)});
+			39.867069, 32.747314
+			39.866980, 32.747340
+			39.867003, 32.747375
+			39.867100, 32.747359
+		 */ // The following numbers ARE NOT CORRECT; for test only.
+		ParkingRow testRow = new ParkingRow(4, new LatLng[] {new LatLng(39.867069, 32.747314),
+				new LatLng(39.866980, 32.747340),
+				new LatLng(39.867003, 32.747375),
+				new LatLng(39.867100, 32.747359)});
 		Log.d("TEST","TEST");
 
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
 		}
-
+/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
 			GroundOverlay dot = mMap.addGroundOverlay((GroundOverlayOptions) overlay.getValue());
 			Log.d("TEST", "LATITUDE: " + ((LatLng) overlay.getKey()).latitude + "\n" +
 					"LONGITUDE: " + ((LatLng) overlay.getKey()).longitude + "\n");
 		}
-
+*/
 		// Parking slot ground overlay listener
 		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
 				.addChildEventListener(new ChildEventListener() {
@@ -490,5 +474,8 @@ public class MainActivity extends AppCompatActivity
 					@Override
 					public void onCancelled(DatabaseError databaseError) {}
 				});
+
+		MapsInitializer.initialize(getApplicationContext());
+		serverUtil = ServerUtil.getInstance();
 	}
 }

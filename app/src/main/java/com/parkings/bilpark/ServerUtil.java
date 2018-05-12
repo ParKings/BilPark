@@ -97,8 +97,8 @@ public class ServerUtil {
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
 				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
+				i++;
 			}
-			i++;
 		}
 		noOfSlots = i;
 
