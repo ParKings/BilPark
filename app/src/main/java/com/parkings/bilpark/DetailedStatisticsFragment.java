@@ -169,7 +169,6 @@ public class DetailedStatisticsFragment extends Fragment {
 		LineDataSet lineDataSet3 = new LineDataSet(yAxesMescid, "Mescid Park");
 		lineDataSet1.setDrawCircles(false);
 		lineDataSet3.setColor(Color.YELLOW);
-
 		lineDataSets.add(lineDataSet1);
 		lineDataSets.add(lineDataSet2);
 		lineDataSets.add(lineDataSet3);
