@@ -1,6 +1,7 @@
 package com.parkings.bilpark;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,15 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
+import java.util.ArrayList;
 
 
 /**
@@ -64,15 +74,15 @@ public class DetailedStatisticsFragment extends Fragment {
 	private int percentage;
 	private Button backButton;
 	private Fragment fragment;
+	private LineChart lineChart;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		/*if (getArguments() != null) {
-			mParam1 = getArguments().getString(ARG_PARAM1);
-			mParam2 = getArguments().getString(ARG_PARAM2);
-		}*/
+
+
+
 	}
 
 	@Override
@@ -121,6 +131,55 @@ public class DetailedStatisticsFragment extends Fragment {
 		lotInfo = view.findViewById(R.id.lotname_info);
 		backButton = view.findViewById(R.id.back_button);
 
+		lineChart = (LineChart) view.findViewById(R.id.lineChart);
+
+		ArrayList<String> xAxes = new ArrayList<>();
+		ArrayList<Entry> yAxesNano = new ArrayList<>();
+		ArrayList<Entry> yAxesUnam = new ArrayList<>();
+		ArrayList<Entry> yAxesMescid = new ArrayList<>();
+
+		int x = 0;
+		int numDataPoints = 10;
+		for(int i = 1; i <= numDataPoints; i++)
+		{
+			float nanoFunction = Float.parseFloat(String.valueOf(Math.sqrt(x)));
+			float unamFunction = Float.parseFloat(String.valueOf(Math.pow(x, 3)));
+			float mescidFunction = Float.parseFloat(String.valueOf(Math.pow(x,5)));
+			x += 1;
+			yAxesNano.add(new Entry(nanoFunction,i));
+			yAxesUnam.add(new Entry(unamFunction,i));
+			yAxesMescid.add(new Entry(mescidFunction,i));
+			xAxes.add(String.valueOf(x));
+		}
+		String[] xaxes = new String[xAxes.size()];
+		for (int i = 0; i < xAxes.size(); i++)
+		{
+			xaxes[i] = xAxes.get(i).toString();
+		}
+		ArrayList<ILineDataSet> lineDataSets = new ArrayList<>();
+
+		LineDataSet lineDataSet1 = new LineDataSet(yAxesNano, "Nano Park");
+		lineDataSet1.setDrawCircles(false);
+		lineDataSet1.setColor(Color.BLUE);
+
+		LineDataSet lineDataSet2 = new LineDataSet(yAxesUnam, "Unam Park");
+		lineDataSet1.setDrawCircles(false);
+		lineDataSet2.setColor(Color.RED);
+
+		LineDataSet lineDataSet3 = new LineDataSet(yAxesMescid, "Mescid Park");
+		lineDataSet1.setDrawCircles(false);
+		lineDataSet3.setColor(Color.YELLOW);
+
+		lineDataSets.add(lineDataSet1);
+		lineDataSets.add(lineDataSet2);
+		lineDataSets.add(lineDataSet3);
+
+		lineChart.setData(new LineData(lineDataSets));
+		lineChart.setVisibleXRangeMaximum(10f);
+
+		lineChart.setBackgroundColor(Color.WHITE);
+
+
 		backButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -143,6 +202,7 @@ public class DetailedStatisticsFragment extends Fragment {
 												int index, long id) {
 
 				lotInfo.setText(scheduleTypes[index] + " Statistics For " + currentLot);
+
 				//percentage = getRoundedRatio(index);
 			}
 
