@@ -4,9 +4,7 @@ package com.parkings.bilpark;
  * A class for holding general complaint format
  *
  * @author Emre Acarturk
- * @version 2018.04.28.0 : Added getters and JavaDoc
- *
- * @deprecated Functionality transferred to AppComplaintsFragment and UserComplaintsFragment.
+ * @version 2018.05.12.0 : Un-deprecation.
  */
 public class Complaint {
 	private String complaintBody;

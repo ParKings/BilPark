@@ -32,7 +32,7 @@ public class ParkingSpot {
 	public static final String centerTag = "center";
 
 	//properties
-	public boolean isParked;
+	public boolean parked;
 	private double latitude;
 	private double longitude;
 
@@ -65,6 +65,14 @@ public class ParkingSpot {
 		this.longitude = longitude;
 	}
 
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
 	/**
 	 * Secondary constructor initializing parameters.
 	 *
@@ -78,7 +86,7 @@ public class ParkingSpot {
 		this.corners = corners;
 		latitude = (corners[0].latitude + corners[2].latitude) / 2;
 		longitude = (corners[0].longitude + corners[2].longitude) / 2;
-		isParked = false;
+		parked = false;
 		center = getCenter();
 		LatLngBounds dotBounds = new LatLngBounds(
 
@@ -101,7 +109,7 @@ public class ParkingSpot {
 	 */
 	@Exclude
 	public void park() {
-		isParked = true;
+		parked = true;
 	}
 
 	/**
@@ -109,7 +117,7 @@ public class ParkingSpot {
 	 */
 	@Exclude
 	public void unpark() {
-		isParked = false;
+		parked = false;
 	}
 
 	/**
@@ -118,7 +126,7 @@ public class ParkingSpot {
 	 * @return Is the parking lot parked?
 	 */
 	public boolean isParked() {
-		return isParked;
+		return parked;
 	}
 
 	/**
@@ -143,7 +151,7 @@ public class ParkingSpot {
 
 	@Exclude
 	public String toString() {
-		return ("\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + isParked);
+		return ("\nCENTER LAT: " + center.latitude + "\nCENTER LONG: " + center.longitude + "\nPARKED: " + parked);
 	}
 
 	/**
