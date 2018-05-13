@@ -59,15 +59,15 @@ public class ServerUtil {
 	private ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
 	private ConcurrentHashMap<String, Integer> occupancyData;
 	private ConcurrentHashMap<String, Double> statisticsData;
-	private CopyOnWriteArrayList<ParkingSpot> slots;
+	private ArrayList<ParkingSpot> slots;
 
 	// Constructor
 	/**
 	 * Default constructor
 	 */
-	public ServerUtil() {
+	private ServerUtil() {
 		// The method "initLotsAndRows" is not yet called
-		slots = new CopyOnWriteArrayList<>();
+		slots = new ArrayList<>();
 		occupancyData = new ConcurrentHashMap<>();
 		statisticsData = new ConcurrentHashMap<>();
 
@@ -111,9 +111,26 @@ public class ServerUtil {
 		}
 		noOfSlots = i;
 
+		// Initial state
+		parkingDataReference.child("slots").addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				for (int i = 0; i < noOfSlots; i++) {
+					ParkingSpot tmp = dataSnapshot.child(i + "").getValue(ParkingSpot.class);
+					if (tmp == null)
+						throw new Error();
+					slots.add(tmp);
+				}
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+
 		// Parked slot data retrieval listener.
 		parkingDataReference.child("slots")
-				.orderByChild(ParkingSpot.isParkedTag)
 				.addChildEventListener(new ChildEventListener() {
 					@Override
 					public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -121,11 +138,10 @@ public class ServerUtil {
 
 					@Override
 					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-						if (slots.size() == 0)
-							for (int i = 0; i < noOfSlots; i++)
-								slots.add(dataSnapshot.child(i + "").getValue(ParkingSpot.class));
-						else
-							slots.set(Integer.parseInt(s), dataSnapshot.child(s).getValue(ParkingSpot.class));
+						ParkingSpot tmp = dataSnapshot.child(s).getValue(ParkingSpot.class);
+						if (tmp == null)
+							throw new Error();
+						slots.set(Integer.parseInt(s), tmp);
 					}
 
 					@Override
@@ -247,7 +263,7 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	CopyOnWriteArrayList<ParkingSpot> getParkingSpots() {
+	ArrayList<ParkingSpot> getParkingSpots() {
 		return slots;
 	}
 

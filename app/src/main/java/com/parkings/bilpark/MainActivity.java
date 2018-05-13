@@ -89,8 +89,6 @@ public class MainActivity extends AppCompatActivity
 	private Marker userMarker;
 	LatLng test;
 	private ServerUtil serverUtil;
-	private ArrayList<ParkingSpot> slotsClone;
-	private CopyOnWriteArrayList<ParkingSpot> slots;
 	private HashMap<LatLng, GroundOverlay> redDots = new HashMap<>();
 	LatLng keyf;
 	private BitmapDrawable bitmapdraw2;
@@ -113,6 +111,8 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		MapsInitializer.initialize(getApplicationContext());
+		serverUtil = ServerUtil.getInstance();
 		supportMapFragment = SupportMapFragment.newInstance();
 
 		setContentView(R.layout.activity_main);
@@ -508,9 +508,6 @@ public class MainActivity extends AppCompatActivity
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
 		} */
-		serverUtil = new ServerUtil();
-		slots = serverUtil.getParkingSpots();
-		slotsClone = new ArrayList<>(slots);
 		Log.d("TEST COUNTER", ""+ParkingSpot.counter);
 		/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
@@ -533,26 +530,26 @@ public class MainActivity extends AppCompatActivity
 
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
+						ArrayList<ParkingSpot> slots = serverUtil.getParkingSpots();
 						Toast.makeText(MainActivity.this,"DATA DEGISTI " + slots.size(), Toast.LENGTH_SHORT).show();
 						nanotamMarker.setTitle( String.format("%.2f", 100 * ( dataSnapshot.child("occupiedSlots").getValue(Integer.class) + 0.0 ) / dataSnapshot.child("totalSlots").getValue(Integer.class)) + "%");
-						for ( int i = 0; i < slotsClone.size(); i++ ) {
+						for ( int i = 0; i < slots.size(); i++ ) {
 							//IF SOMEBODY PARKS
 /*							Toast.makeText(MainActivity.this,"LEL", Toast.LENGTH_SHORT).show();
 							Log.d( "DEBUG DATA LISTENER: ", "\n" + "ITERATION: " + i + "\n"
 									+ slotsClone.get(i).isParked() + "\n" + slots.get(i).isParked()); */
-							if ( slotsClone.get(i).isParked() != slots.get(i).isParked()
-									&& slots.get(i).isParked() ) {
+							if ( slots.get(i).isParked() ) {
 								parked( slots.get(i).getCenter() );
 							}
 							//IF SOMEBODY UNPARKS
-							else if ( slotsClone.get(i).isParked() != slots.get(i).isParked()
-									&& !slots.get(i).isParked() ) {
+							else if ( !slots.get(i).isParked() ) {
 
-								redDots.get( slots.get(i).getCenter() ).remove();
-								redDots.remove( slots.get(i).getCenter() );
+								if (redDots.get( slots.get(i).getCenter() ) != null) {
+									redDots.get(slots.get(i).getCenter()).remove();
+									redDots.remove(slots.get(i).getCenter());
+								}
 							}
 						}
-						slotsClone = new ArrayList<>(slots);
 					}
 				});
 

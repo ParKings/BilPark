@@ -42,7 +42,7 @@ public class ActionButtonFragment extends Fragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		activity = (MainActivity) getActivity();
-		serverUtil = new ServerUtil();
+		serverUtil = ServerUtil.getInstance();
 		FloatingActionButton fab = view.findViewById(R.id.fab);
 		fab.setOnClickListener(new OnClickListener() {
 			@Override

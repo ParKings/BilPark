@@ -2,6 +2,7 @@ package com.parkings.bilpark;
 
 import android.graphics.Color;
 
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -19,6 +20,8 @@ import java.util.HashMap;
  * @version 12.05.2018.0
  */
 public class ParkingSpot {
+
+
 	//CORNERS ARE ASSIGNED IN COUNTERCLOCKWISE DIRECTION
 	//SIDE 12 AND 03 ARE LONGER ONES
 	//SIDE 01 AND 32 ARE SHORTER ONES
@@ -29,7 +32,10 @@ public class ParkingSpot {
 	public static final String centerTag = "center";
 
 	//properties
-	private boolean isParked;
+	public boolean isParked;
+	private double latitude;
+	private double longitude;
+
 	@Exclude
 	private LatLng center;
 	@Exclude
@@ -48,6 +54,15 @@ public class ParkingSpot {
 	 * Default constructor needed for Firebase integration
 	 */
 	public ParkingSpot() {
+
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
 	}
 
 	/**
@@ -61,11 +76,10 @@ public class ParkingSpot {
 		}
 		counter++;
 		this.corners = corners;
-		center = new LatLng(
-				(corners[0].latitude + corners[2].latitude) / 2,
-				(corners[0].longitude + corners[2].longitude) / 2
-		);
+		latitude = (corners[0].latitude + corners[2].latitude) / 2;
+		longitude = (corners[0].longitude + corners[2].longitude) / 2;
 		isParked = false;
+		center = getCenter();
 		LatLngBounds dotBounds = new LatLngBounds(
 
 				new LatLng(center.latitude - 0.000012, center.longitude - 0.000012 ),       // South west corner
@@ -124,7 +138,7 @@ public class ParkingSpot {
 	 */
 	@Exclude
 	public LatLng getCenter() {
-		return center;
+		return center = new LatLng(latitude, longitude);
 	}
 
 	@Exclude
