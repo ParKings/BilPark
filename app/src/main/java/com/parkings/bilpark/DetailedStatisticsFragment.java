@@ -228,6 +228,7 @@ public class DetailedStatisticsFragment extends Fragment {
 			lineDataSets.add(lineDataSet3_3);
 		}
 		lineChart.setData(new LineData(lineDataSets));
+		lineChart.invalidate();
 	}
 
 	/**
