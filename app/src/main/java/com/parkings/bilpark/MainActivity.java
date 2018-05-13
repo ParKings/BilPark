@@ -80,10 +80,19 @@ public class MainActivity extends AppCompatActivity
 	boolean mapClicked;
 	boolean cameraClicked;
 	boolean polygonClicked;
+	//boolean nanotamClicked;
+	//boolean mescidClicked;
+	//boolean unamClicked;
+	boolean firstPush;
+	boolean secondPush;
 	private Fragment fragment, actionButton;
 	private NavigationView navigationView;
 	private Polygon nanotamPolygon;
 	private Marker nanotamMarker;
+	private Polygon mescidPolygon;
+	private Marker mescidMarker;
+	private Polygon unamPolygon;
+	private Marker unamMarker;
 	Location parkLocation;
 	boolean userParked = false;
 	private Marker userMarker;
@@ -255,7 +264,9 @@ public class MainActivity extends AppCompatActivity
 			ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
 					1 );
 		}
+
 		lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 0, locationListener);
 		if (lastKnownLocation != null) {
 			userLocation = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
 			//mMap.addMarker(new MarkerOptions().position(userLocation).title("Marker in Turkey"));
@@ -266,6 +277,9 @@ public class MainActivity extends AppCompatActivity
 					//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 					.build();                  // Creates a CameraPosition from the builder
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+			if ( userMarker != null ) {
+				userMarker.remove();
+			}
 			userMarker = mMap.addMarker(new MarkerOptions().
 					position(userLocation).
 					icon(BitmapDescriptorFactory.fromResource(R.drawable.baseline_navigation_black_48dp)));
@@ -296,6 +310,36 @@ public class MainActivity extends AppCompatActivity
 			nanotamPolygon.setTag("nanotam");
 			nanotamMarker.showInfoWindow();
 		}
+		/**
+		else if ( tag.equals("mescid") && !mescidClicked ) {
+			mescidPolygon = mMap.addPolygon(new PolygonOptions()
+					.add(
+							new LatLng(39.867656589928885,32.75062870234251),
+							new LatLng(39.867765699255635,32.75253340601921),
+							new LatLng(39.8659684612521,32.75245092809201),
+							new LatLng(39.86596331445483,32.750481851398945))
+					.strokeColor(Color.BLACK)
+					.fillColor(Color.GRAY)
+					.strokeWidth(10)
+					.clickable(true));
+			mescidPolygon.setTag("mescid");
+			mescidMarker.showInfoWindow();
+		}
+		else if ( tag.equals("unam") && !unamClicked ) {
+			unamPolygon = mMap.addPolygon(new PolygonOptions()
+					.add(
+							new LatLng(39.86917870082838,32.747862339019775),
+							new LatLng(39.86910253175345,32.74663086980581),
+							new LatLng(39.86933850121406,32.7466020360589),
+							new LatLng(39.86947720044192,32.74790424853563))
+					.strokeColor(Color.BLACK)
+					.fillColor(Color.GRAY)
+					.strokeWidth(10)
+					.clickable(true));
+			unamPolygon.setTag("unam");
+			unamMarker.showInfoWindow();
+		}
+		 **/
 	}
 
 	@Override
@@ -305,6 +349,11 @@ public class MainActivity extends AppCompatActivity
 		mapClicked = false;
 		cameraClicked = false;
 		polygonClicked = false;
+		secondPush = false;
+		firstPush = false;
+		//nanotamClicked = false;
+		//mescidClicked = false;
+		//unamClicked = false;
 
 		mMap.setLatLngBoundsForCameraTarget( new LatLngBounds(
 				new LatLng(39.864870, 32.746315),
@@ -333,6 +382,28 @@ public class MainActivity extends AppCompatActivity
 
 		GroundOverlay nanotamOverlay = mMap.addGroundOverlay(nanotam);
 
+		LatLngBounds mescidBounds = new LatLngBounds(
+				new LatLng(39.865979, 32.750582),       // South west corner
+				new LatLng(39.86771912194634,32.752494513988495));      // North east corner
+
+		final GroundOverlayOptions mescid = new GroundOverlayOptions()
+				.image(BitmapDescriptorFactory.fromResource(R.raw.mescid))
+				.positionFromBounds(mescidBounds)
+				.transparency(0f);
+
+		GroundOverlay mescidOverlay = mMap.addGroundOverlay(mescid);
+
+		LatLngBounds unamBounds = new LatLngBounds(
+				new LatLng(39.86911642746938,32.74663891643286),       // South west corner
+				new LatLng(39.8694617608386,32.74786803871393));      // North east corner
+
+		final GroundOverlayOptions unam = new GroundOverlayOptions()
+				.image(BitmapDescriptorFactory.fromResource(R.raw.unam))
+				.positionFromBounds(unamBounds)
+				.transparency(0f);
+
+		GroundOverlay unamOverlay = mMap.addGroundOverlay(unam);
+
 
 		nanotamMarker = mMap.addMarker(
 				new MarkerOptions().position(
@@ -341,16 +412,36 @@ public class MainActivity extends AppCompatActivity
 		nanotamMarker.setTag("nanotamMarker");
 		nanotamMarker.showInfoWindow();
 
+		/**
+		mescidMarker = mMap.addMarker(
+				new MarkerOptions().position(
+						new LatLng(39.867077329724296,32.751618437469))
+						.title("Loading...").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+		mescidMarker.setTag("mescidMarker");
+		mescidMarker.showInfoWindow();
+
+		unamMarker = mMap.addMarker(
+				new MarkerOptions().position(
+						new LatLng(39.86931148185135,32.747369818389416))
+						.title("Loading...").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+		unamMarker.setTag("unamMarker");
+		unamMarker.showInfoWindow();
+		 **/
+
 		addPolygon("nanotam");
+		//addPolygon("mescid" );
+		//addPolygon( "unam" );
 
 		mMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
 			@Override
 			public void onPolygonClick(Polygon polygon) {
 				polygonClicked = true;
 				mapClicked = true;
+				firstPush = false;
 				Log.i("POLYGON CLICKLENDI", "IF'IN DISI");
 				if (polygon.getTag().equals("nanotam")) {
 					Log.i("POLYGON CLICKLENDI", "IF'IN ICI");
+					//nanotamClicked = true;
 					nanotamPolygon.remove();
 					nanotamMarker.hideInfoWindow();
 					CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -361,6 +452,34 @@ public class MainActivity extends AppCompatActivity
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 				}
+				/**
+				else if (polygon.getTag().equals("mescid")) {
+					Log.i("POLYGON CLICKLENDI", "IF'IN ICI");
+					//mescidClicked = true;
+					mescidPolygon.remove();
+					mescidMarker.hideInfoWindow();
+					CameraPosition cameraPosition = new CameraPosition.Builder()
+							.target(new LatLng(39.867077329724296,32.751618437469))      // Sets the center of the map to Mountain View
+							.zoom(18)                  // Sets the zoom
+							.bearing(180f)                // Sets the orientation of the camera to east
+							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
+							.build();                  // Creates a CameraPosition from the builder
+					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+				}
+				else if (polygon.getTag().equals("unam")) {
+					Log.i("POLYGON CLICKLENDI", "IF'IN ICI");
+					//unamClicked = true;
+					unamPolygon.remove();
+					unamMarker.hideInfoWindow();
+					CameraPosition cameraPosition = new CameraPosition.Builder()
+							.target(new LatLng(39.86931148185135,32.747369818389416))      // Sets the center of the map to Mountain View
+							.zoom(19)                  // Sets the zoom
+							.bearing(180f)                // Sets the orientation of the camera to east
+							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
+							.build();                  // Creates a CameraPosition from the builder
+					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+				}
+				 **/
 			}
 		});
 
@@ -454,7 +573,9 @@ public class MainActivity extends AppCompatActivity
 				Log.i("MARKER", "CLICKLENDI");
 				polygonClicked = true;
 				mapClicked = true;
+				firstPush = false;
 				if ( marker.getTag().equals("nanotamMarker") ) {
+					//nanotamClicked = true;
 					CameraPosition cameraPosition = new CameraPosition.Builder()
 							.target(new LatLng(39.866855, 32.747324))      // Sets the center of the map to Mountain View
 							.zoom(19)                  // Sets the zoom
@@ -465,6 +586,38 @@ public class MainActivity extends AppCompatActivity
 					nanotamMarker.hideInfoWindow();
 					nanotamPolygon.remove();
 				}
+				/**
+				else if ( marker.getTag().equals("mescid") ) {
+					mescidClicked = true;
+					mescidPolygon = mMap.addPolygon(new PolygonOptions()
+							.add(
+									new LatLng(39.867656589928885,32.75062870234251),
+									new LatLng(39.867765699255635,32.75253340601921),
+									new LatLng(39.8659684612521,32.75245092809201),
+									new LatLng(39.86596331445483,32.750481851398945))
+							.strokeColor(Color.BLACK)
+							.fillColor(Color.GRAY)
+							.strokeWidth(10)
+							.clickable(true));
+					mescidPolygon.setTag("mescid");
+					mescidMarker.showInfoWindow();
+				}
+				else if ( marker.getTag().equals("unam") ) {
+					unamClicked = true;
+					unamPolygon = mMap.addPolygon(new PolygonOptions()
+							.add(
+									new LatLng(39.86917870082838,32.747862339019775),
+									new LatLng(39.86910253175345,32.74663086980581),
+									new LatLng(39.86933850121406,32.7466020360589),
+									new LatLng(39.86947720044192,32.74790424853563))
+							.strokeColor(Color.BLACK)
+							.fillColor(Color.GRAY)
+							.strokeWidth(10)
+							.clickable(true));
+					unamPolygon.setTag("unam");
+					unamMarker.showInfoWindow();
+				}
+				 **/
 				return true;
 			}
 		});

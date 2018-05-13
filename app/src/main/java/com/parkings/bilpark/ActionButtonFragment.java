@@ -49,7 +49,17 @@ public class ActionButtonFragment extends Fragment {
 			public void onClick(View view) {
 				activity.getUserLocation();
 				activity.polygonClicked = false;
-				activity.addPolygon("nanotam");
+				if ( activity.firstPush ) {
+					activity.secondPush = true;
+				}
+				if ( activity.secondPush == false ) {
+					activity.firstPush = true;
+				}
+				if ( !activity.secondPush && activity.firstPush ) {
+					activity.addPolygon("nanotam");
+				}
+				//activity.addPolygon( "mescid");
+				//activity.addPolygon( "unam");
 			}
 		});
 
