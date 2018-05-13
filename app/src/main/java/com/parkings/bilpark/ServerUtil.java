@@ -1,6 +1,7 @@
 package com.parkings.bilpark;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
@@ -105,7 +106,7 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
+//				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 				i++;
 			}
 		}
@@ -138,9 +139,10 @@ public class ServerUtil {
 
 					@Override
 					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-						ParkingSpot tmp = dataSnapshot.child(s).getValue(ParkingSpot.class);
+						ParkingSpot tmp = dataSnapshot.getValue(ParkingSpot.class);
 						if (tmp == null)
 							throw new Error();
+						Log.i("THE_STR", s == null ? "null" : s);
 						slots.set(Integer.parseInt(s), tmp);
 					}
 
