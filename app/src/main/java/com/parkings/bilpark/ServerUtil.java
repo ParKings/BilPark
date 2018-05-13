@@ -1,8 +1,10 @@
 package com.parkings.bilpark;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,17 +58,17 @@ public class ServerUtil {
 	// Properties
 	private ArrayList<ParkingLot> parkingLots = new ArrayList<ParkingLot>();
 	private ArrayList<ParkingRow> parkingRows = new ArrayList<ParkingRow>();
-	private ConcurrentHashMap<String, Double> occupancyData;
+	private ConcurrentHashMap<String, Integer> occupancyData;
 	private ConcurrentHashMap<String, Double> statisticsData;
-	private CopyOnWriteArrayList<ParkingSpot> slots;
+	private ArrayList<ParkingSpot> slots;
 
 	// Constructor
 	/**
 	 * Default constructor
 	 */
-	public ServerUtil() {
+	private ServerUtil() {
 		// The method "initLotsAndRows" is not yet called
-		slots = new CopyOnWriteArrayList<>();
+		slots = new ArrayList<>();
 		occupancyData = new ConcurrentHashMap<>();
 		statisticsData = new ConcurrentHashMap<>();
 
@@ -104,21 +106,52 @@ public class ServerUtil {
 		int i = 0;
 		for (ParkingRow parkingRow : parkingRows) {
 			for (ParkingSpot parkingSpot : parkingRow.parkingSpots) {
-				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
+//				parkingDataReference.child("slots").child(i + "").setValue(parkingSpot);
 				i++;
 			}
 		}
 		noOfSlots = i;
 
+		// Initial state
+		parkingDataReference.child("slots").addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				for (int i = 0; i < noOfSlots; i++) {
+					ParkingSpot tmp = dataSnapshot.child(i + "").getValue(ParkingSpot.class);
+					if (tmp == null)
+						throw new Error();
+					slots.add(tmp);
+				}
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+
 		// Parked slot data retrieval listener.
 		parkingDataReference.child("slots")
-				.orderByChild(ParkingSpot.isParkedTag)
-				.addValueEventListener(new ValueEventListener() {
+				.addChildEventListener(new ChildEventListener() {
 					@Override
-					public void onDataChange(DataSnapshot dataSnapshot) {
+					public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+					}
 
-						for (int i = 0; i > noOfSlots; i++)
-							slots.set(i, dataSnapshot.child(i + "").getValue(ParkingSpot.class));
+					@Override
+					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+						ParkingSpot tmp = dataSnapshot.getValue(ParkingSpot.class);
+						if (tmp == null)
+							throw new Error();
+						Log.i("THE_STR", s == null ? "null" : s);
+						slots.set(Integer.parseInt(s), tmp);
+					}
+
+					@Override
+					public void onChildRemoved(DataSnapshot dataSnapshot) {
+					}
+
+					@Override
+					public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 					}
 
 					@Override
@@ -232,7 +265,7 @@ public class ServerUtil {
 	 *
 	 * @return LatLng's of all of the parked ParkingSlots
 	 */
-	CopyOnWriteArrayList<ParkingSpot> getParkingSpots() {
+	ArrayList<ParkingSpot> getParkingSpots() {
 		return slots;
 	}
 
@@ -296,9 +329,9 @@ public class ServerUtil {
 	 *               unamLotTag    : double
 	 *            }
 	 */
-	ConcurrentHashMap<String, Double> getOccupancy() {
-		statisticsReference.child("concurrent")
-				.addListenerForSingleValueEvent(new ValueEventListener() {
+	ConcurrentHashMap<String, Integer> getOccupancy() {
+		statisticsReference.child("parkingdata/lots")
+				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onDataChange(DataSnapshot dataSnapshot) {
 						occupancyData = dataSnapshot.getValue(ConcurrentHashMap.class);

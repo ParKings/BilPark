@@ -49,10 +49,10 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This is the main "Park" activity; the starting point of our application.
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity
 	private Marker userMarker;
 	LatLng test;
 	private ServerUtil serverUtil;
-	private CopyOnWriteArrayList<ParkingSpot> slotsClone;
 	private HashMap<LatLng, GroundOverlay> redDots = new HashMap<>();
 	LatLng keyf;
 	private BitmapDrawable bitmapdraw2;
@@ -109,6 +108,8 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		MapsInitializer.initialize(getApplicationContext());
+		serverUtil = ServerUtil.getInstance();
 		supportMapFragment = SupportMapFragment.newInstance();
 
 		setContentView(R.layout.activity_main);
@@ -333,7 +334,7 @@ public class MainActivity extends AppCompatActivity
 		nanotamMarker = mMap.addMarker(
 				new MarkerOptions().position(
 						new LatLng(39.86685447665023, 32.74732355028391))
-						.title("%46").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+						.title("Loading...").icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
 		nanotamMarker.setTag("nanotamMarker");
 		nanotamMarker.showInfoWindow();
 
@@ -389,8 +390,10 @@ public class MainActivity extends AppCompatActivity
 							//.tilt(30)                // Sets the tilt of the camera to 30 degrees
 							.build();                  // Creates a CameraPosition from the builder
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-					userMarker.remove();
-					userMarker.setPosition(new LatLng (location.getLatitude(),location.getLongitude()));
+					if ( userMarker != null ) {
+						userMarker.remove();
+						userMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+					}
 					mapClicked = false;
 				}
 			}
@@ -415,7 +418,12 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onMapClick(LatLng latLng) {
 				Log.i("MAP", latLng.toString());
+				parkLocation = new Location("");
+				parkLocation.setLatitude(latLng.latitude);
+				parkLocation.setLongitude(latLng.longitude);
+				Log.d("TEST", "" +  parkLocation.getLatitude() + "\n" + parkLocation.getLongitude() );
 				//FOR TEST
+				/*
 				test = latLng;
 				keyf = serverUtil.park(test);
 				if ( keyf == null ) {
@@ -423,7 +431,7 @@ public class MainActivity extends AppCompatActivity
 				}
 				else {
 					parked(keyf);
-				}
+				} */
 				//FOR TEST
 				mapClicked = true;
 			}
@@ -481,7 +489,7 @@ public class MainActivity extends AppCompatActivity
 			39.867100, 32.747359
 		 */ // The following numbers ARE NOT CORRECT; for test only.
 
-
+		/*
 		mMap.addPolygon(new PolygonOptions()
 				.add(new LatLng(39.867142692959746,32.74706404656172),
 						new LatLng(39.86657861133413,32.74714753031731),
@@ -489,7 +497,7 @@ public class MainActivity extends AppCompatActivity
 						new LatLng(39.867100232597345,32.74715155363083))
 				.strokeColor(Color.BLACK)
 				.fillColor(Color.GRAY)
-				.strokeWidth(10) );
+				.strokeWidth(10) ); */
 
 		 /**
 		Log.d("TEST","TEST");
@@ -497,8 +505,6 @@ public class MainActivity extends AppCompatActivity
 		for ( ParkingSpot ps: testRow.parkingSpots ) {
 			Log.d("TEST\n\n", ps.toString());
 		} */
-		serverUtil = new ServerUtil();
-		slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
 		Log.d("TEST COUNTER", ""+ParkingSpot.counter);
 		/*
 		for (Map.Entry overlay : (ParkingSpot.dots).entrySet()) {
@@ -508,45 +514,40 @@ public class MainActivity extends AppCompatActivity
 		}
 		*/
 
+		/*
 		for ( LatLng[] latLngs: ParkingSpot.polytest ) {
 			polyTest(latLngs[0], latLngs[1], latLngs[2], latLngs[3]);
-		}
+		} */
 
 		// Parking slot ground overlay listener
-		FirebaseDatabase.getInstance().getReference().child("parkingdata/slots")
-				.addChildEventListener(new ChildEventListener() {
-					@Override
-					public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-						Toast.makeText(MainActivity.this,"DATA DEGISTI", Toast.LENGTH_SHORT);
-						for ( int i = 0; i < serverUtil.getParkingSpots().size(); i++ ) {
-							//IF SOMEBODY PARKS
-							if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
-									&& serverUtil.getParkingSpots().get(i).isParked() ) {
-
-								parked( serverUtil.getParkingSpots().get(i).getCenter() );
-							}
-							//IF SOMEBODY UNPARKS
-							else if ( slotsClone.get(i).isParked() != serverUtil.getParkingSpots().get(i).isParked()
-									&& !serverUtil.getParkingSpots().get(i).isParked() ) {
-
-								redDots.get( serverUtil.getParkingSpots().get(i).getCenter() ).remove();
-								redDots.remove( serverUtil.getParkingSpots().get(i).getCenter() );
-							}
-						}
-						slotsClone = (CopyOnWriteArrayList) serverUtil.getParkingSpots().clone();
-					}
-
-					@Override
-					public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
-
-					@Override
-					public void onChildRemoved(DataSnapshot dataSnapshot) {}
-
-					@Override
-					public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-
+		FirebaseDatabase.getInstance().getReference().child("parkingdata/lots")
+				.addValueEventListener(new ValueEventListener() {
 					@Override
 					public void onCancelled(DatabaseError databaseError) {}
+
+					@Override
+					public void onDataChange(DataSnapshot dataSnapshot) {
+						ArrayList<ParkingSpot> slots = serverUtil.getParkingSpots();
+						Toast.makeText(MainActivity.this,"DATA DEGISTI " + slots.size(), Toast.LENGTH_SHORT).show();
+						nanotamMarker.setTitle( String.format("%.2f", 100 * ( dataSnapshot.child("occupiedSlots").getValue(Integer.class) + 0.0 ) / dataSnapshot.child("totalSlots").getValue(Integer.class)) + "%");
+						for ( int i = 0; i < slots.size(); i++ ) {
+							//IF SOMEBODY PARKS
+/*							Toast.makeText(MainActivity.this,"LEL", Toast.LENGTH_SHORT).show();
+							Log.d( "DEBUG DATA LISTENER: ", "\n" + "ITERATION: " + i + "\n"
+									+ slotsClone.get(i).isParked() + "\n" + slots.get(i).isParked()); */
+							if ( slots.get(i).isParked() ) {
+								parked( slots.get(i).getCenter() );
+							}
+							//IF SOMEBODY UNPARKS
+							else if ( !slots.get(i).isParked() ) {
+
+								if (redDots.get( slots.get(i).getCenter() ) != null) {
+									redDots.get(slots.get(i).getCenter()).remove();
+									redDots.remove(slots.get(i).getCenter());
+								}
+							}
+						}
+					}
 				});
 
 		MapsInitializer.initialize(getApplicationContext());
