@@ -8,13 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.Toast;
 
 /**
  * Created by uğur on 27.03.2018. Opens up the complaints XML file and oversees
@@ -34,7 +29,13 @@ public class ComplaintsFragment extends Fragment {
 	private RadioButton radiobutton2;
 	private Fragment fragment;
 
-	/* __________STUB__________ */
+	/*
+	 * Initializes ComplaintsFragment via particular parameters
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -11,9 +11,16 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-
+/*
+ * Opens up the user complaints XML file and oversees
+ * functionality of the related buttons and text fields.
+ *
+ * @author Furkan
+ * @version 2018.05.12.0
+ */
 public class UserComplaintsFragment extends Fragment {
 
+	//properties
 	private EditText editComplaint;
 	private String[] listOfLots;
 	private ArrayAdapter<String> adapter;
@@ -21,10 +28,18 @@ public class UserComplaintsFragment extends Fragment {
 	private Spinner spinner;
 	private ServerUtil serverUtil;
 
+	/**
+	 * A default constructor that helps to inirtialize this fragment
+	 */
 	public UserComplaintsFragment() {
 		serverUtil = ServerUtil.getInstance();
 	}
 
+	/*
+	 * Initializes list of the names of lots while this view is created
+	 *
+	 * @param savedInstanceState
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,6 +49,13 @@ public class UserComplaintsFragment extends Fragment {
 						ServerUtil.mescidLotTag};
 	}
 
+	/*
+	 * Initializes UserComplaintsFragment via particular parameters
+	 *
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 */
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -41,6 +63,12 @@ public class UserComplaintsFragment extends Fragment {
 		return inflater.inflate(R.layout.user_complaints_fragment, null);
 	}
 
+	/*
+	 * The items in this view are initialized via this method
+	 *
+	 * @param view
+	 * @param savedInstanceState
+	 */
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -49,7 +77,6 @@ public class UserComplaintsFragment extends Fragment {
 		spinner.setAdapter(adapter);
 		editComplaint = view.findViewById(R.id.editText);
 		editComplaint.setText("");
-
 
 		view.findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
 			@Override
