@@ -126,7 +126,6 @@ public class MainActivity extends AppCompatActivity
 		navigationView = findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
 
-		supportMapFragment.getMapAsync(this);
 		// the two lines below are VERY VERY VERY IMPORTANT as they ensure that the app launches with the park option selected
 		onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_park));
 		navigationView.getMenu().getItem(0).setChecked(true);
@@ -187,6 +186,7 @@ public class MainActivity extends AppCompatActivity
 		FragmentTransaction fragmentTransaction;
 		if (id == R.id.nav_park) {
 			// handle the park fragment
+			supportMapFragment.getMapAsync(this);
 			if (!supportMapFragment.isAdded()) {
 				supportFragmentManager.beginTransaction().add(R.id.map, supportMapFragment).commit();
 			} else {
